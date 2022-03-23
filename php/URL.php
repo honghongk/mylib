@@ -39,7 +39,7 @@ class URL
             $res['root'] = array_pop ( $parse ) . $v ;
             if ( ! empty ( $parse ) )
                 $res['sub'] = implode('.',$parse) ;
-            $res['tld'] = $v;
+            $res['tld'] = implode('.',array_filter(explode('.',$v)));
             break;
         }
         return $res ;

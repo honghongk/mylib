@@ -22,13 +22,21 @@ class File
 			return $this->$p ;
 	}
 
-    static function touch ( string $file )
+	/**
+	 * 다운로드
+	 */
+	function download()
+	{
+
+	}
+
+    private static function touch ( string $file )
     {
         touch($file);
         return new self ( $file ) ;
     }
 
-    static function tmp ( string $dir, string|NULL $prefix = NULL)
+    private static function tmp ( string $dir, string|NULL $prefix = NULL)
     {
         $f = tempnam ( $dir , $prefix ) ;
         if ( ! is_file ( $f ) )

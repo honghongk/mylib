@@ -1,10 +1,10 @@
 <?php
-namespace DB;
+namespace DB\Mysql;
 
 use PDO;
 use exception;
 
-class Mysql
+class Query
 {
 	static protected ?PDO $DB ;
 	function __construct ( ?array $config = array() )

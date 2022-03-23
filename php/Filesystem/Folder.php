@@ -40,11 +40,11 @@ class Folder
 
 	static function mkdirp ( string $dir )
 	{
-		$d = explode(DIRECTORY_SEPARATOR,$dir);
+		$d = explode ( DIRECTORY_SEPARATOR, $dir ) ;
 		$path = '';
 		foreach ($d as $v)
 		{
-			$path .= $v.DIRECTORY_SEPARATOR;
+			$path .= $v . DIRECTORY_SEPARATOR;
 			self::mkdir($path);
 		}
 		return new self($path);
