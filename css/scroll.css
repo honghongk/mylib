@@ -1,0 +1,51 @@
+/**
+
+어디선가 복사해옴
+
+스크롤바 커스터마이징
+
+위치를 바꾸려면
+기본스크롤바 안보이게 숨기고
+다른곳에 스크롤바 보이게 한 다음
+같이 움직이게 js 와 같이 짜야함
+
+*/
+
+
+.scroll{
+    display:block;
+    overflow-x:scroll;
+    overflow-y:scroll;
+}
+.scroll::-webkit-scrollbar { width: 5.2px; } /* 스크롤 바 */
+.scroll::-webkit-scrollbar-track { background-color:#5D5D5D; } /* 스크롤 바 밑의 배경 */
+.scroll::-webkit-scrollbar-thumb { background: #303030; } /* 실질적 스크롤 바 */
+.scroll::-webkit-scrollbar-thumb:hover { background: #404040; } /* 실질적 스크롤 바 위에 마우스를 올려다 둘 때 */
+.scroll::-webkit-scrollbar-thumb:active { background: #808080; } /* 실질적 스크롤 바를 클릭할 때 */
+.scroll::-webkit-scrollbar-button { display: none; } /* 스크롤 바 상 하단 버튼 */
+
+.scroll-x{
+    display:block;
+    overflow-x:scroll;
+}
+.scroll-x::-webkit-scrollbar { width: 10px; } /* 스크롤 바 */
+.scroll-x::-webkit-scrollbar-track { background-color:#5D5D5D; } /* 스크롤 바 밑의 배경 */
+.scroll-x::-webkit-scrollbar-thumb { background: #303030; } /* 실질적 스크롤 바 */
+.scroll-x::-webkit-scrollbar-thumb:hover { background: #404040; } /* 실질적 스크롤 바 위에 마우스를 올려다 둘 때 */
+.scroll-x::-webkit-scrollbar-thumb:active { background: #808080; } /* 실질적 스크롤 바를 클릭할 때 */
+.scroll-x::-webkit-scrollbar-button { display: none; } /* 스크롤 바 상 하단 버튼 */
+.scroll-y{
+    display:block;
+    overflow-y:scroll;
+}
+.scroll-y::-webkit-scrollbar { width: 10px; } /* 스크롤 바 */
+.scroll-y::-webkit-scrollbar-track { background-color:#5D5D5D; } /* 스크롤 바 밑의 배경 */
+.scroll-y::-webkit-scrollbar-thumb { background: #303030; } /* 실질적 스크롤 바 */
+.scroll-y::-webkit-scrollbar-thumb:hover { background: #404040; } /* 실질적 스크롤 바 위에 마우스를 올려다 둘 때 */
+.scroll-y::-webkit-scrollbar-thumb:active { background: #808080; } /* 실질적 스크롤 바를 클릭할 때 */
+.scroll-y::-webkit-scrollbar-button { display: none; } /* 스크롤 바 상 하단 버튼 */
+
+.scroll-x-hidden{
+    display:block;
+    overflow-x:hidden;
+}
