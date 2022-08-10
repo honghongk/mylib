@@ -61,3 +61,14 @@ Math.ratio = function(){
     });
     return args ;
 };
+
+/**
+ * https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+ * 두 수 사이 값 얻기
+ * @param Number 최대
+ * @param Number 최소
+ * @return Number
+ */
+Math.randomBetween = function(max,min){
+    return Math.random() * (max - min) + min;
+}
