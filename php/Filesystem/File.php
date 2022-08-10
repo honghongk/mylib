@@ -2,42 +2,47 @@
 
 namespace Filesystem;
 
-use Filesystem\FilesystemException;
+use Filesystem\AbstractFS;
+use Exception;
+// use Filesystem\FilesystemException;
 
 
-class File
+class File extends AbstractFS
 {
-	protected $file;
-	function __construct ( string $file )
-	{
-		if ( ! is_file ( $file ) || ! is_readable ( $file ) || ! is_writable ( $file ) )
-			throw new FilesystemException ( '파일이 없거나 읽기쓰기 권한없음 : ' . $file ) ;
-
-		$this->file = $file;
-	}
-
-    function __get ( $p )
-	{
-		if ( property_exists ( $this , $p ) )
-			return $this->$p ;
-	}
-
 	/**
-	 * 다운로드
+	 * 파일 권한 확인 후 프로퍼티 세팅
+	 * @param string 경로
 	 */
-	function download()
+	function __construct ( string $path )
 	{
+		if ( ! is_file ( $path ) || ! is_readable ( $path ) || ! is_writable ( $path ) )
+			throw new Exception ( '파일이 없거나 읽기쓰기 권한없음 : ' . $path ) ;
 
+		// 왜안됨
+		// parent::__construct($path);
+		foreach ($this->info($path) as $k => $v)
+			$this->$k = $v;
 	}
 
-    private static function touch ( string $file )
+
+    static function touch ( string $file )
     {
-        touch($file);
+		if ( ! is_file ( $file ) )
+        	touch($file);
+
+		// camelcase
+		$ext = ucfirst(pathinfo($file)['extension']);
+		$class = __NAMESPACE__.'\\'.$ext;
+		if ( class_exists ( $class ) )
+			return new $class($file);
         return new self ( $file ) ;
     }
 
-    private static function tmp ( string $dir, string|NULL $prefix = NULL)
+    static function tmp ( string $dir = NULL, string $prefix = NULL)
     {
+		if ( empty ( $dir ) )
+			$dir = sys_get_temp_dir();
+
         $f = tempnam ( $dir , $prefix ) ;
         if ( ! is_file ( $f ) )
             throw new FilesystemException ( '임시파일 생성 실패 : 디렉토리 : ' . $dir ) ;
@@ -46,22 +51,13 @@ class File
 
     function remove()
     {
-        return unlink($this->file);
+        return unlink($this->realpath);
     }
 
-	function info()
-	{
-		return array(
-			'mime' => mime_content_type ( $this->file ) ,
-			'mtime' => filemtime ( $this->file ) ,
-			'type' => filetype ( $this->file ) ,
-            'bytes' => filesize ( $this->file ) ,
-		);
-	}
 
 	function read ()
 	{
-		$f = fopen($this->file , 'r');
+		$f = fopen($this->realpath , 'r');
 		while ( $r = fgets($f) )
             yield $r;
 		fclose($f);
@@ -70,7 +66,7 @@ class File
 
 	function write ( string $contents )
 	{
-		$f = fopen ( $this->file , 'w' ) ;
+		$f = fopen ( $this->realpath , 'w' ) ;
 		flock ( $f , LOCK_EX ) ;
 		$w = fwrite ( $f , $contents ) ;
 		flock ( $f , LOCK_UN ) ;
@@ -80,7 +76,7 @@ class File
 
 	function append ( string $contents )
 	{
-		$f = fopen ( $this->file , 'a' ) ;
+		$f = fopen ( $this->realpath , 'a' ) ;
 		flock ( $f , LOCK_EX ) ;
 		$w = fwrite ( $f , $contents ) ;
 		flock ( $f , LOCK_UN ) ;
@@ -89,20 +85,20 @@ class File
 	}
 
 
-	function parse()
-	{
-		$file = $this->file;
-		$ext = explode('.',$file);
-		$ext = array_pop($ext);
-		if ($ext == 'json')
-			return json_decode(file_get_contents($file),TRUE);
-		elseif($ext == 'yaml')
-			return yaml_parse_file($file);
-		elseif($ext == 'yml')
-			return yaml_parse_file($file);
-		elseif($ext == 'xml')
-			return simplexml_load_file($file);
-		elseif($ext == 'ini')
-			return parse_ini_file($file,TRUE);
-	}
+	// function parse()
+	// {
+	// 	$file = $this->realpath;
+	// 	$ext = explode('.',$file);
+	// 	$ext = array_pop($ext);
+	// 	if ($ext == 'json')
+	// 		return json_decode(file_get_contents($file),TRUE);
+	// 	elseif($ext == 'yaml')
+	// 		return yaml_parse_file($file);
+	// 	elseif($ext == 'yml')
+	// 		return yaml_parse_file($file);
+	// 	elseif($ext == 'xml')
+	// 		return simplexml_load_file($file);
+	// 	elseif($ext == 'ini')
+	// 		return parse_ini_file($file,TRUE);
+	// }
 }
