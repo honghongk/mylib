@@ -1,6 +1,24 @@
 'use strict';
 
 /**
+ * https://7942yongdae.tistory.com/96
+ * 배열 섞기
+ * @return Array
+ */
+Array.prototype.shuffle = function(){
+  returnthis.sort(()=> Math.random() - 0.5);
+};
+
+/**
+ * 배열 무작위 value 빼기
+ * @return Array
+ */
+Array.prototype.random = function(){
+  return this.shuffle.pop();
+};
+
+
+/**
  * 큰 수 부터 나열 sort 거꾸로
  * @returns {Array}
  */
@@ -52,15 +70,3 @@ Array.prototype.symmetric = function(){
     });
     return res;
 };
-
-
-
-let a = [1,25,22,54,54,73,66,44,42,31,3,4];
-let b = [53,46,5,3,4,67,5,4,45,3,4,44,99];
-let c = [1,3,5,4];
-
-console.log(a.descend(b,c))
-console.log(a.diff(b,c))
-console.log(a.intersection(b,c))
-console.log('---------------------------------------------')
-console.log(a.symmetric(b,c))
