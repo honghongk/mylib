@@ -42,8 +42,8 @@ from selenium.common import exceptions
 
 # --------------------------------------------------------------------------------
 # 파라미터 받거나 하는부분
-host = 'http://211.37.179.64'
-login = host+'/ws_namdala/auth/'
+host = ''
+login = host+''
 
 # 로그아웃 빼고 실행
 ignore = ['logout']
