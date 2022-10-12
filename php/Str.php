@@ -89,5 +89,44 @@ class Str
 
 		return implode('',$res);
 	}
-
+	
+	
+	/**
+	 * 영단어 복수형을 단수형으로
+	 * @param string 단어
+	 * @return string 단수형
+	 */
+	static function singleWord($str)
+	{
+		if(strpos(strrev($str), strrev('sses')) === 0 ){
+			$str = preg_replace('/sses$/', 'ss' ,$str);
+		}
+		else if(strpos(strrev($str), strrev('ies')) === 0 ){
+			$str = preg_replace('/ies$/', 'y' ,$str);
+		}
+		else if(strpos(strrev($str), strrev('s')) === 0 ){
+			$str = preg_replace('/(?<=[^s])s$/', '' ,$str);
+		}
+		return $str;
+	}
+	
+	
+	/**
+	 * 영단어 단수형을 복수형으로
+	 * @param string 단어
+	 * @return string 복수형
+	 */
+	static function singleWord($str)
+	{
+		if(strpos(strrev($str), strrev('sses')) !== 0 && strpos(strrev($str), strrev('ss')) === 0 ){
+			$str = preg_replace('/ss$/', 'sses' ,$str);
+		}
+		else if(strpos(strrev($str), strrev('y')) === 0 ){
+			$str = preg_replace('/y$/', 'ies' ,$str);
+		}
+		else if(strpos(strrev($str), strrev('s')) !== 0 ){
+			$str .= 's';
+		}
+		return $str;
+	}
 }
