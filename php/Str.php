@@ -116,7 +116,7 @@ class Str
 	 * @param string 단어
 	 * @return string 복수형
 	 */
-	static function singleWord($str)
+	static function multipleWord($str)
 	{
 		if(strpos(strrev($str), strrev('sses')) !== 0 && strpos(strrev($str), strrev('ss')) === 0 ){
 			$str = preg_replace('/ss$/', 'sses' ,$str);
