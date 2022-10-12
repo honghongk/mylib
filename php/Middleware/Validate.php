@@ -42,12 +42,24 @@ class Validate implements MiddlewareInterface
 
     /**
      * https://stackoverflow.com/questions/8299886/php-get-static-methods
-     * public static method 만 추출해서 입력
+     * static method 만 추출해서 입력
      */
     function __construct()
     {
         if ( empty ( self::$method ) )
         {
+            /**
+             * 버전마다 상수 다름
+             * ReflectionMethod
+             * const int IS_STATIC = 16;
+             * const int IS_PUBLIC = 1;
+             * const int IS_PROTECTED = 2;
+             * const int IS_PRIVATE = 4;
+             * const int IS_ABSTRACT = 64;
+             * const int IS_FINAL = 32;
+             * 
+             * public static 메서드만 추출
+             */
             $r = new ReflectionClass(__CLASS__);
             $m = array_intersect(
                 $r->getMethods(ReflectionMethod::IS_STATIC),
@@ -224,7 +236,6 @@ class Validate implements MiddlewareInterface
      */
     function check()
     {
-        $this->request = (array) $this->request;
         foreach ($this->rule as $k => $rule)
         {
             // 엄격한 파라미터 검사 적용 대상
@@ -237,6 +248,7 @@ class Validate implements MiddlewareInterface
             }
 
             $res = $this->recursive($this->request[$k],$rule,$this->response[$k]);
+
             // 중간에 에러 있으면 리턴
             if ( ! is_null ( $res ) )
                 return $res;
