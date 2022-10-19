@@ -9,6 +9,96 @@ class Arr
 {
 
     /**
+     * 랜덤으로 흩뜨리기
+     * @param float 평균값
+     * @param int 배열 항목 수
+     * @param float 최소비율 1이 100퍼  소수점 3자리까지만
+     * @param float 최대비율 1이 100퍼  소수점 3자리까지만
+     * @return array 흩트러진 값
+     */
+    function dispersion( $avg, $pad, $min, $max )
+    {
+        $total = $avg * $pad;
+        $res = array_pad([], $pad, 0);
+
+        $max = $max * 1000;
+        $min = $min * 1000;
+        foreach ($res as $k => $v)
+        {
+            $v = round( $avg * (rand($min,$max) / 1000), 3 );
+            $total -= $v;
+            $res[$k] = $v;
+        }
+        $div = $total / $pad;
+        // total 수 만큼 전체적으로 보정해주기
+        return array_map(function($v)use($div){
+            $v += $div;
+            return $v;
+        },$res);
+    }
+
+
+    /**
+     * 키의 데이터 기준으로 정렬
+     * @fix 다차원 배열은 나중에
+     * @param array 2차 배열
+     * @param string|array 1차 키
+     * @return array
+     */
+    static function rsort($arr, $key)
+    {
+        if ( is_string($key))
+            $key = [$key];
+
+        $order = [];
+        foreach ($arr as $v) {
+            $str = '';
+            foreach ($key as $k)
+                $str .= $v[$k];
+            if ( ! isset ( $order[$str] ) )
+                $order[$str] = [];
+            $order[$str][] = $v;
+        }
+        krsort($order);
+
+        $res = [];
+        foreach ($order as $v)
+            foreach ( $v as $vv )
+                $res[] = $vv;
+        return $res;
+    }
+
+    /**
+     * 키의 데이터 기준으로 정렬
+     * @fix 다차원 배열은 나중에
+     * @param array 2차 배열
+     * @param string|array 1차 키
+     * @return array
+     */
+    static function sort($arr, $key)
+    {
+        if ( is_string($key))
+            $key = [$key];
+
+        $order = [];
+        foreach ($arr as $v) {
+            $str = '';
+            foreach ($key as $k)
+                $str .= $v[$k];
+            if ( ! isset ( $order[$str] ) )
+                $order[$str] = [];
+            $order[$str][] = $v;
+        }
+        ksort($order);
+
+        $res = [];
+        foreach ($order as $v)
+            foreach ( $v as $vv )
+                $res[] = $vv;
+        return $res;
+    }
+
+    /**
      * k => v 인지 확인
      * @param array 배열
      * @return bool
