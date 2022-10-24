@@ -7,25 +7,26 @@
  */
 class Arr
 {
-
-    /**
+     /**
      * 랜덤으로 흩뜨리기
      * @param float 평균값
      * @param int 배열 항목 수
-     * @param float 최소비율 1이 100퍼  소수점 3자리까지만
-     * @param float 최대비율 1이 100퍼  소수점 3자리까지만
+     * @param float 최소비율 1이 100퍼
+     * @param float 최대비율 1이 100퍼
+     * @param int 소수점 자리수
      * @return array 흩트러진 값
      */
-    function dispersion( $avg, $pad, $min, $max )
+    function array_pad_dispersion( $avg, $pad, $min, $max , $precision = 3 )
     {
         $total = $avg * $pad;
         $res = array_pad([], $pad, 0);
 
-        $max = $max * 1000;
-        $min = $min * 1000;
+        $div = pow(10,$precision);
+        $max = $max * $div;
+        $min = $min * $div;
         foreach ($res as $k => $v)
         {
-            $v = round( $avg * (rand($min,$max) / 1000), 3 );
+            $v = round( $avg * (rand($min,$max) / $div), $precision );
             $total -= $v;
             $res[$k] = $v;
         }
