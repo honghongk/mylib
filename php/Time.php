@@ -1,3 +1,4 @@
+
 <?php
 
 
@@ -91,6 +92,32 @@ class Time
 
 
     /**
+     * 특정 요일인지 확인
+     * @param int|string 날짜
+     * @param int|string 요일
+     * @return boolean
+     */
+    static function isDay($date, $d)
+    {
+        if ( ! is_numeric ( $date ) )
+            $date = strtotime ( $date ) ;
+        
+        // 영어단어로 체크
+        if( ! is_numeric( $d ) )
+            return date('l', $date ) == $d;
+        else
+        {
+            // 숫자로 체크
+            if ( in_array ( $d, range ( 0 , 6 ) ) )
+                throw new Exception("0 ~ 6 숫자를 입력하세요", 1);
+            
+            $w = date('w', $date );
+            return $w == $d;
+        } 
+    }
+
+
+    /**
      * 월 끝날 얻기
      * @param int|string 날짜
      * @return string 날짜 포맷 
@@ -151,4 +178,6 @@ class Time
         }
         return $res;
     }
+
+
 }
