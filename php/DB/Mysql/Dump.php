@@ -10,8 +10,11 @@ class Dump extends Mysql
 {
     /**
      * 테이블 얻기
+     * @param string 테이블 이름
+     * @param boolean 데이터 포함
+     * @return string sql
      */
-    static function table ( $name = '' )
+    static function table ( $name = '' , $data = true )
     {
         $name = self::escape($name);
         $sql = 'SHOW FULL TABLES';
@@ -19,8 +22,8 @@ class Dump extends Mysql
             $sql .= ' LIKE \''.$name.'\'';
 
         $res = [];
-        $data = self::query($sql);
-        foreach ($data as $r)
+        $table = self::query($sql);
+        foreach ($table as $r)
         {
             $name = array_shift($r);
             if ( $r['Table_type'] == 'BASE TABLE' )
@@ -31,6 +34,26 @@ class Dump extends Mysql
                     htmlspecialchars_decode($r['Create Table'])
                 );
                 $res[] = $t;
+
+                // 데이터도 백업
+                if ( $data )
+                {
+                    $table_data = self::query ( 'SELECT * FROM `'.$name.'`' );
+
+                    $row = [];
+                    foreach ($table_data as $v)
+                    {
+                        foreach ($v as $kk => $vv)
+                        {
+                            if ( ! is_numeric ( $vv ) )
+                                $vv = '\''.$vv.'\'';
+                            $v[$kk] = $vv;
+                        }
+                        $row[] = implode(',',$v);
+                    }
+
+                    $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
+                }
             }
             else
             {
