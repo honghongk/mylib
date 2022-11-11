@@ -45,12 +45,13 @@ class Dump extends Mysql
                     {
                         foreach ($v as $kk => $vv)
                         {
-                            if ( ! is_numeric ( $vv ) )
-                                $vv = '\''.$vv.'\'';
+                            if ( ! is_numeric ( $vv ) && strpos( $vv , '0') == 0 )
+                                $vv = '\''.self::escape($vv).'\'';
                             $v[$kk] = $vv;
                         }
                         $row[] = implode(',',$v);
                     }
+
                     if ( ! empty ( $row ) )
                         $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
                 }
