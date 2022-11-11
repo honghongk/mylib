@@ -51,8 +51,8 @@ class Dump extends Mysql
                         }
                         $row[] = implode(',',$v);
                     }
-
-                    $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
+                    if ( ! empty ( $row ) )
+                        $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
                 }
             }
             else
