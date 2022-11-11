@@ -49,9 +49,11 @@ class Dump extends Mysql
                         {
                             if ( is_null ( $vv ) )
                                 $vv = 'NULL';
+                            else if ( $vv === '0' || $vv === 0 )
+                                $vv = 0;
                             else if ( is_string($vv) && empty ( $vv ) )
                                 $vv = '\'\'';
-                            else if ( ( ! is_numeric($vv) || ( strlen($vv) > 1 && strpos($vv, '0') === 0 ) ) && ( $vv != 'NULL' || $vv != 'DEFAULT' ) )
+                            else if ( ( ! is_numeric($vv) || strpos($vv, '0') === 0 ) && ( $vv != 'NULL' || $vv != 'DEFAULT' ) )
                                 $vv = '\''.addslashes($vv).'\'';
                             $v[$kk] = $vv;
                         }
