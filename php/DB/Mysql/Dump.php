@@ -33,27 +33,31 @@ class Dump extends Mysql
                     '/AUTO_INCREMENT\s{0,}=\s{0,}[0-9]{0,}/','',
                     htmlspecialchars_decode($r['Create Table'])
                 );
-                $res[] = $t;
+                $res[] = $t.';';
 
                 // 데이터도 백업
                 if ( $data )
                 {
                     $table_data = self::query ( 'SELECT * FROM `'.$name.'`' );
+                    if ( empty ( $table_data ) )
+                        continue;
 
                     $row = [];
                     foreach ($table_data as $v)
                     {
                         foreach ($v as $kk => $vv)
                         {
-                            if ( ! is_numeric ( $vv ) && strpos( $vv , '0') == 0 )
-                                $vv = '\''.self::escape($vv).'\'';
+                            if ( is_null ( $vv ) )
+                                $vv = 'NULL';
+                            else if ( is_string($vv) && empty ( $vv ) )
+                                $vv = '\'\'';
+                            else if ( ( ! is_numeric($vv) || strpos($vv, '0') === 0 ) && ( $vv != 'NULL' || $vv != 'DEFAULT' ) )
+                                $vv = '\''.addslashes($vv).'\'';
                             $v[$kk] = $vv;
                         }
                         $row[] = implode(',',$v);
                     }
-
-                    if ( ! empty ( $row ) )
-                        $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
+                    $res[] = 'INSERT INTO `'.$name.'` VALUES'."\n".' ('.implode('),'."\n".'(',$row).');'."\n";
                 }
             }
             else
@@ -63,7 +67,7 @@ class Dump extends Mysql
                     '/DEFINER\s{0,}=\s{0,}`?[^`]{0,}`?@`?[^`]{0,}`?/','',
                     htmlspecialchars_decode($r['Create View'])
                 );
-                $res[] = $t;
+                $res[] = $t.';';
             }
         }
         return implode("\n\n",$res);
