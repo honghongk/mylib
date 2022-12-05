@@ -7,6 +7,7 @@
  */
 class Time
 {
+    static protected $yoil = ['일','월','화','수','목','금','토'];
     /**
      * @fix 일단 일 단위로 했고 년/월 단위 할때 뒤에 날짜 어찌할지
      * 날짜/시간 범위 얻기
@@ -158,7 +159,8 @@ class Time
 
     /**
      * 날짜 범위 주별
-     * 기본 제공은 월 ~ 일 묶음
+     * php 기본은 월 ~ 일 묶음
+     * $yoil 순으로 묶기때문에 일 ~ 월
      * @param int|string 시작날짜
      * @param int|string 종료날짜
      * @param string 리턴 포맷
@@ -167,15 +169,41 @@ class Time
      */
     static function rangeWeek($start, $end, $format = 'Y-m-d H:i:s' , $unit = 'd')
     {
-        $range = self::range($start,$end,$format,$unit);
+        // 범위얻기
+        $range = self::range($start,$end,'Y-m-d H:i:s',$unit);
+        $yoil = self::$yoil;
+
         $res = [];
+        // 첫날 요일 찾기
+        $index = intval(date('w', strtotime ( $start ) ));
+        if ( $yoil[$index] != current($yoil) )
+        {
+            while( $r = next($yoil) )
+                if ($yoil[$index] == $r )
+                    break;
+        }
+        // 아래 루프 next도는거 보정
+        prev($yoil);
+
+        // 데이터 채우기
+        // 주 index
+        $i = 0;
         foreach ($range as $r)
         {
-            $w = date('W', strtotime($r));
-            if ( ! isset ( $res[$w] ) )
-                $res[$w] = [];
-            $res[$w][] = $r;
+            // 요일 얻기
+            $w = next($yoil);
+
+            // 요일 다 돌았으면 다음주차
+            if ( $w === false )
+            {
+                $w = reset($yoil);
+                $i ++;
+            }
+
+            // 주차 => 요일 => 날짜
+            $res[$i][$w] = date ( $format , strtotime ( $r ) );
         }
+
         return $res;
     }
 
