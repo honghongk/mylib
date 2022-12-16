@@ -6,8 +6,6 @@ __LIB__=${__DIR__}/lib
 
 source ${__LIB__}/array.sh
 source ${__LIB__}/time.sh
-source ${__LIB__}/file.sh
-source ${__LIB__}/sys.sh
 source ${__DIR__}/api/slack.sh
 
 
@@ -16,7 +14,6 @@ backup_dir=${__DIR__}/backup/`time_today`/
 if [[ ! -d $backup_dir ]];then
     mkdir -p $backup_dir;
 fi
-
 
 # 만료일
 day=14
@@ -27,12 +24,14 @@ expire=$(( 3600 * 24 * $day ))
 expire=`date -d @$(($now - $expire )) +%Y%m%d`
 
 
-dir=`dirname $backup_dir | ls`
-for d in ${dir[@]};do
+dir=`dirname $backup_dir`
+dir=`ls $dir`
 
+
+for d in ${dir[@]};do
     # 만료 폴더 삭제
-    if [[ $expire -gt $expire ]];then
-        rm -rf `realpath $d`
+    if [[ $expire -gt $d ]];then
+        rm -rf `dirname $backup_dir`/$d
     fi
 done
 
@@ -59,3 +58,6 @@ for db in ${DB[@]};do
     | sed "s/DEFINER=\`[a-z]*\`@\`\(localhost\|[0-9.]*\|%\)\`//" \
     > $backup_dir/$db.sql;
 done
+
+
+
