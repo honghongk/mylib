@@ -8,7 +8,6 @@ use Exception;
 use RuntimeException;
 use ReflectionClass;
 use ReflectionMethod;
-use HTTP\Request as Request;
 use Arr;
 
 /**
@@ -42,24 +41,12 @@ class Validate implements MiddlewareInterface
 
     /**
      * https://stackoverflow.com/questions/8299886/php-get-static-methods
-     * static method 만 추출해서 입력
+     * public static method 만 추출해서 입력
      */
     function __construct()
     {
         if ( empty ( self::$method ) )
         {
-            /**
-             * 버전마다 상수 다름
-             * ReflectionMethod
-             * const int IS_STATIC = 16;
-             * const int IS_PUBLIC = 1;
-             * const int IS_PROTECTED = 2;
-             * const int IS_PRIVATE = 4;
-             * const int IS_ABSTRACT = 64;
-             * const int IS_FINAL = 32;
-             * 
-             * public static 메서드만 추출
-             */
             $r = new ReflectionClass(__CLASS__);
             $m = array_intersect(
                 $r->getMethods(ReflectionMethod::IS_STATIC),
@@ -148,6 +135,7 @@ class Validate implements MiddlewareInterface
 
     /**
      * 값 확인, default 적용
+     * @fix 오브젝트일때 array 처럼 사용가능하게
      * @param mixed 데이터
      * @param array 규칙
      * @param array 응답
@@ -161,14 +149,16 @@ class Validate implements MiddlewareInterface
         // 룰 기준으로 도는데
         foreach ($rule as $k => $v)
         {
-            if ( $k == 'optional' )
+            // 데이터키가 optional이 아닌거만
+            if ( ! isset ( $data[$k] ) && $k == 'optional' )
             {
                 if ( ! is_int ( $data ) && ( empty ( $data ) || ! isset ( $data ) ) )
                     break;
                 continue;
             }
+
             // 루프 못돌면 값 확인
-            if ( ! is_iterable ( $data ) )
+            if ( ! is_iterable ( $data ) && gettype($data) != 'object' )
             {
                 if ( $k == 'default' )
                 {
@@ -188,14 +178,13 @@ class Validate implements MiddlewareInterface
             {
                 // array인데 빈값이면 default 있을때 세팅해주기
                 if ( isset ( $v['default'] ) )
-                {
-                    $res = $this->recursive($data[$k] , $v ,$response[$k]);
-                    if ( ! empty ( $res ) )
-                        return $res;
-                }
+                    $data[$k] = $v['default'];
 
+                $res = $this->recursive($data[$k] , $v ,$response[$k]);
+                if ( ! empty ( $res ) )
+                    return $res;
             }
-            else if ( ! empty ( $data ) && array_values($data) === $data )
+            else if ( ! empty ( $data ) && gettype($data) == 'array' && array_values ( $data ) === $data )
             {
                 $depth = Arr::depth($data);
                 // 데이터가 리스트인지 확인 후 재귀
@@ -222,8 +211,18 @@ class Validate implements MiddlewareInterface
                 if ( ! empty ( $res ) )
                     return $res;
             }
+            else if ( ! isset ( $data[$k] ) )
+            {
+                // 데이터가 없는데 다른거 하위 있으면 넘기기
+                $res = $this->recursive($data[$k],$v,$response[$k]);
+                if ( ! empty ( $res ) )
+                return $res;
+            }
             else
+            {
+                
                 throw new RuntimeException('데이터 확인 중 에러');
+            }
         }
     }
 
@@ -236,18 +235,25 @@ class Validate implements MiddlewareInterface
      */
     function check()
     {
+        $o = is_object($this->request);
         foreach ($this->rule as $k => $rule)
         {
-            // 엄격한 파라미터 검사 적용 대상
-            if ( ! is_int ( $k ) && in_array ( strtolower ( $k ) , self::$strict ) ) 
-            {
-                // 요청에 키가 있는데 룰에 없으면 에러 출력
-                $diff = array_diff ( array_keys($this->request[$k]) , array_keys($rule) );
-                if ( ! empty ( $diff ) )
-                    throw new Exception('룰에 정의하지 않은 데이터키가 있습니다 : `' . implode(',',$diff) . '`', 1);
-            }
+            // 레퍼런스는 3항연산자 안됨
+            if ( $o )
+                $data =& $this->request->$k;
+            else
+                $data =& $this->request[$k];
 
-            $res = $this->recursive($this->request[$k],$rule,$this->response[$k]);
+            // 엄격한 파라미터 검사 적용 대상
+            // if ( ! is_int ( $k ) && in_array ( strtolower ( $k ) , self::$strict ) ) 
+            // {
+            //     // 요청에 키가 있는데 룰에 없으면 에러 출력
+            //     $diff = array_diff ( array_keys( $data ) , array_keys($rule) );
+            //     if ( ! empty ( $diff ) )
+            //         throw new Exception('룰에 정의하지 않은 데이터키가 있습니다 : `' . implode(',',$diff) . '`', 1);
+            // }
+
+            $res = $this->recursive($data,$rule,$this->response[$k]);
 
             // 중간에 에러 있으면 리턴
             if ( ! is_null ( $res ) )
@@ -278,6 +284,16 @@ class Validate implements MiddlewareInterface
      */
     public static function date($data, $format)
     {
+        if ( $format == 'Y' )
+            return self::int($data) && self::min($data,1) ;
+        else if ( $format == 'm' )
+            return self::int($data) && self::min($data,1) && self::max($data,12);
+
+        if ( strtotime($data) === false )
+        {
+            var_dump($data,$format);
+            throw new Exception("날짜 형식 변경실패", 1);
+        }
         return date($format, strtotime($data)) == $data;
     }
 
