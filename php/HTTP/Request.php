@@ -35,25 +35,25 @@ class Request implements ArrayAccess
     }
 
 
-    public function offsetExists($offset)
-	{
-		return isset($this->$offset) ;
-	}
-	
-	public function offsetGet($offset)
-	{
+    public function offsetExists($offset):bool
+    {
+        return isset($this->$offset) ;
+    }
+    
+    public function offsetGet($offset)
+    {
         return $this->$offset;
-	}
+    }
 
-	public function offsetSet($offset, $value)
-	{
+    public function offsetSet($offset, $value):void
+    {
         $this->$offset = $value;
-	}
+    }
 
-	public function offsetUnset($offset)
-	{
-		unset($this->$offset);
-	}
+    public function offsetUnset($offset):void
+    {
+        unset($this->$offset);
+    }
 
 
     /**
@@ -178,6 +178,39 @@ class Request implements ArrayAccess
     static function cookie()
     {
         return $_COOKIE;
+    }
+
+
+    /**
+     * 요청 데이터 타입, 확장자 우선
+     * @return string 타입
+     */
+    static function type()
+    {
+        // 기본값
+        $default = 'html';
+
+        // 확장자 있다면
+        $ext = pathinfo ( self::uri() )['extension'] ?? '' ;
+        if ( ! empty ( $ext ) )
+            return $ext;
+
+        // 헤더 확인
+        $accept = self::header()['Accept'] ?? '';
+        $accept = explode(',',$accept)[0];
+        $accept = explode('/',$accept)[1] ?? '';
+
+
+        // * 처리는 안해놔서 기본값으로
+        if ( $accept == '*' )
+            $accept = $default;
+
+        // accept 요청 헤더 있다면
+        if ( ! empty ( $accept ) )
+            return $accept;
+        
+        // 기본값 리턴
+        return $default;
     }
 
 
