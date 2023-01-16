@@ -5,7 +5,7 @@
 const scroll = {
     /**
      * http://yoonbumtae.com/?p=3584
-     * @see throttle 과 의미의 구분을 모르겠음
+     * @see throttle 과 다른점을 모르겠음
      * ms 마다 한번씩만 실행되게 해줌
      * @param {*} func 실행할 함수
      * @param {*} ms 실행제한 시간
