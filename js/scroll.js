@@ -1,9 +1,44 @@
-
 /**
  * 스크롤 이벤트
  * deltaX, deltaY 는 mousewheel 이벤트만 가능
  */
 const scroll = {
+    /**
+     * http://yoonbumtae.com/?p=3584
+     * @see throttle 과 의미의 구분을 모르겠음
+     * ms 마다 한번씩만 실행되게 해줌
+     * @param {*} func 실행할 함수
+     * @param {*} ms 실행제한 시간
+     * @returns 이벤트에 걸 함수
+     */
+    _debounce: function(func, ms = 100){
+        let timeout;
+        return (... args)=>{
+            clearTimeout(timeout);
+            timeout = setTimeout(()=>{
+                func.apply(this,args);
+            },ms);
+        };
+    },
+
+    /**
+     * ms 마다 한번씩만 실행되게 해줌
+     * @param {*} func 실행할 함수
+     * @param {*} ms 실행제한 시간
+     * @returns 이벤트에 걸 함수
+     */
+    _throttle: function(func, ms = 100){
+        let w = false;
+        return (... args)=>{
+            if ( w )
+                return;
+            func.apply(this,args);
+            w = true;
+            setTimeout(()=>{
+                w = false;
+            },ms);
+        };
+    },
 
     /**
      * [Element] 로 가공
@@ -53,11 +88,11 @@ const scroll = {
         let target = this._check(selector);
         for (const i of target)
         {
-            i.addEventListener('mousewheel',function(e){
+            i.addEventListener('mousewheel',this._throttle(function(e){
                 e.preventDefault();
                 this.scrollLeft += e.deltaY > 0 ? 100 : -100 ;
                 scroll._dispatch(func, e);
-            });
+            }));
         }
     },
 
@@ -74,14 +109,14 @@ const scroll = {
 
         for (const i of target)
         {
-            i.addEventListener('mousewheel',(e)=>{
+            i.addEventListener('mousewheel',this._throttle((e)=>{
                 let len = (i.scrollHeight - i.offsetHeight) 
                     || document.documentElement.scrollHeight - window.innerHeight;
                 let top = i.scrollTop || document.documentElement.scrollTop;
 
                 if ( top / len > per )
                     scroll._dispatch(func, e);
-            });
+            }));
         }
     },
 
@@ -99,14 +134,14 @@ const scroll = {
 
         for (const i of target)
         {
-            i.addEventListener('scroll',(e)=>{
+            i.addEventListener('scroll',this._throttle((e)=>{
                 let len = (i.scrollHeight - i.offsetHeight) 
                     || document.documentElement.scrollHeight - window.innerHeight;
                 let top = i.scrollTop || document.documentElement.scrollTop;
 
                 if ( top / len > per )
                     scroll._dispatch(func, e);
-            });
+            }));
         }
 
     },
@@ -125,14 +160,14 @@ const scroll = {
 
         for (const i of target)
         {
-            i.addEventListener('scroll',(e)=>{
+            i.addEventListener('scroll',this._throttle((e)=>{
                 let len = (i.scrollWidth - i.offsetWidth)
                     || document.documentElement.scrollWidth - window.innerHeight;
                 let left = i.scrollLeft || document.documentElement.scrollLeft;
 
                 if ( left / len < per )
                     scroll._dispatch(func, e);
-            });
+            }));
         }
 
     },
@@ -151,14 +186,14 @@ const scroll = {
 
         for (const i of target)
         {
-            i.addEventListener('scroll',(e)=>{
+            i.addEventListener('scroll',this._throttle((e)=>{
                 let len = (i.scrollWidth - i.offsetWidth)
                     || document.documentElement.scrollWidth - window.innerHeight;
                 let left = i.scrollLeft || document.documentElement.scrollLeft;
 
                 if ( left / len > per )
                     scroll._dispatch(func, e);
-            });
+            }));
         }
 
     },
