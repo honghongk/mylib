@@ -5,6 +5,7 @@
 namespace HTTP;
 
 use ArrayAccess;
+use Iterator;
 
 
 /**
@@ -13,8 +14,9 @@ use ArrayAccess;
  * 배열접근 가능하게하는 메서드 4개
  * 7,8 버전 인터페이스 다름
  */
-class Session implements ArrayAccess
+class Session implements ArrayAccess , Iterator
 {
+    protected $position = [];
     function __construct ()
     {
         $this->start();
@@ -22,22 +24,86 @@ class Session implements ArrayAccess
     }
 
 
+    /**
+     * 주석 어케 ??
+     * @implement Iterator
+     */
+    public function rewind()
+    {
+        $this->position = [];
+    }
 
+
+    /**
+     * @implement Iterator
+     */
+    public function current()
+    {
+        return self::get($this->position);
+    }
+
+
+    /**
+     * @implement Iterator
+     */
+    public function key()
+    {
+        return $this->position;
+    }
+
+
+    /**
+     * @implement Iterator
+     */
+    public function next()
+    {
+        // 현재의 다음 키 얻어와서 세팅 하고 뱉어야함
+        echo '<pre>';
+        var_dump(__CLASS__,__FUNCTION__);
+        var_dump($this->position);
+        exit;
+    }
+
+
+    /**
+     * @implement Iterator
+     */
+    public function valid()
+    {
+        return is_null($this->current());
+    }
+
+
+    /**
+     * @implement ArrayAccess
+     */
     public function offsetExists($offset)
     {
         return self::get($offset) !== false ;
     }
-    
+
+
+    /**
+     * @implement ArrayAccess
+     */
     public function &offsetGet($offset)
     {
         return $this->get($offset);
     }
 
+
+    /**
+     * @implement ArrayAccess
+     */
     public function offsetSet($offset, $value)
     {
         $this->set($offset, $value) ;
     }
 
+
+    /**
+     * @implement ArrayAccess
+     */
     public function offsetUnset($offset)
     {
         if ( session_status() != PHP_SESSION_ACTIVE )
@@ -45,6 +111,7 @@ class Session implements ArrayAccess
         unset($_SESSION[$offset]);
         $this->close();
     }
+
 
     protected function close()
     {
@@ -90,7 +157,7 @@ class Session implements ArrayAccess
         // 맞는 키 찾아서 리턴
         $res = NULL;
         foreach ( $args as $v )
-            $res = $res[$v] ?? $_SESSION[$v] ?? false ;
+            $res = $res[$v] ?? $_SESSION[$v] ?? NULL ;
         return $res;
     }
 
