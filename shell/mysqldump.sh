@@ -15,6 +15,7 @@ if [[ ! -d $backup_dir ]];then
     mkdir -p $backup_dir;
 fi
 
+
 # 만료일
 day=14
 
@@ -22,7 +23,6 @@ day=14
 now=`time_unix`
 expire=$(( 3600 * 24 * $day ))
 expire=`date -d @$(($now - $expire )) +%Y%m%d`
-
 
 dir=`dirname $backup_dir`
 dir=`ls $dir`
@@ -34,7 +34,6 @@ for d in ${dir[@]};do
         rm -rf `dirname $backup_dir`/$d
     fi
 done
-
 
 # mysql DB 얻기
 DB=`mysql -e 'show databases'`;
@@ -58,6 +57,3 @@ for db in ${DB[@]};do
     | sed "s/DEFINER=\`[a-z]*\`@\`\(localhost\|[0-9.]*\|%\)\`//" \
     > $backup_dir/$db.sql;
 done
-
-
-
