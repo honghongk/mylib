@@ -206,6 +206,34 @@ class Time
 
         return $res;
     }
+    
+    
+    /**
+     * 특정 시간의 주 전체 얻기
+     * @param null|string|int 기준날짜
+     * @param string 날짜 포맷
+     * @return array<string> 한주
+     */
+    static function getWeek($date = NULL, $format = 'Y-m-d H:i:s')
+    {
+        // 숫자로 바꿔주기
+        if ( is_null ( $date ) )
+            $date = time();
+        else if ( ! is_numeric ( $date ) )
+            $date = strtotime($date) ;
+
+        // 요일 찾기
+        $day = date('w',$date);
+
+        // 요일이라 하루 기준 시간 고정 계산
+        $start = (0 - $day) * 86400;
+        $end = (6 - $day) * 86400;
+
+        $start_date = $date + $start;
+        $end_date = $date + $end;
+
+        return self::range($start_date, $end_date, $format);
+    }
 
 
 }
