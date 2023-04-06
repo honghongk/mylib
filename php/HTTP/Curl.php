@@ -1,7 +1,30 @@
 <?php
 
 
-namespace HTTP;
+namespace Network\HTTP;
+
+
+/**
+ * 
+ * @fix 다른 메서드일때 데이터 집어넣는거 빼먹음
+ * 사용법
+ $curl = new Curl('http://naver.com');
+ $curl->get($data)->send();
+ $curl->post($data)->send();
+
+
+ $curl
+ ->method('put')
+ ->setOption( CURLOPT_COOKIEFILE, true )
+ ->send();
+
+
+ @see 필요시 추가
+$result[1] = curl_errno($ch);
+$result[2] = curl_error($ch);
+$result[3] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+ */
+
 
 
 class Curl
@@ -90,6 +113,19 @@ class Curl
     }
 
 
+    function header( $arr )
+    {   
+        $h = [];
+        foreach ($arr as $k => $v) {
+            $h[] = $k.': '.$v;
+        }
+
+        $this->setOption(CURLOPT_HTTPHEADER, $h);
+
+        return $this;
+    }
+
+
     /**
      * HTTP method
      * @param string GET POST 등
@@ -126,6 +162,8 @@ class Curl
 
     function post ( $data )
     {
+        if ( is_array($data) || is_object($data) )
+            $data = http_build_query($data);
         $this->setOption(CURLOPT_POST,true);
         $this->setOption(CURLOPT_POSTFIELDS,$data);
         return $this;
