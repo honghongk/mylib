@@ -11,7 +11,7 @@ const scroll = {
      * @param {*} ms 실행제한 시간
      * @returns 이벤트에 걸 함수
      */
-    _debounce: function(func, ms = 100){
+    _debounce: function(func, ms = 200){
         let timeout;
         return (... args)=>{
             clearTimeout(timeout);
@@ -22,12 +22,13 @@ const scroll = {
     },
 
     /**
+     * @fix 이거 인터벌만주고 다 실행하긴함 수정해야함
      * ms 마다 한번씩만 실행되게 해줌
      * @param {*} func 실행할 함수
      * @param {*} ms 실행제한 시간
      * @returns 이벤트에 걸 함수
      */
-    _throttle: function(func, ms = 100){
+    _throttle: function(func, ms = 200){
         let w = false;
         return (... args)=>{
             if ( w )
@@ -42,7 +43,7 @@ const scroll = {
 
     /**
      * [Element] 로 가공
-     * @param {string|element|NodeList|Jquery} selector 
+     * @param {string|element|NodeList|Jquery} selector
      * @returns {[Element]}
      */
     _check: function(selector){
@@ -66,7 +67,7 @@ const scroll = {
 
     /**
      * 이벤트나 함수 실행
-     * @param {CustomEvent|Function|null} func 
+     * @param {CustomEvent|Function|null} func
      */
     _dispatch: function(func, e){
         if ( ! func )
@@ -78,9 +79,9 @@ const scroll = {
     },
     /**
      * 가로 스크롤 마우스휠 활성화
-     * @param {string|HTMLElement|NodeList|Jquery} selector 
-     * @param {CustomEvent|Function|null} func 
-     * @returns 
+     * @param {string|HTMLElement|NodeList|Jquery} selector
+     * @param {CustomEvent|Function|null} func
+     * @returns
      */
     row: function(selector, func){
 
@@ -88,7 +89,7 @@ const scroll = {
         let target = this._check(selector);
         for (const i of target)
         {
-            i.addEventListener('mousewheel',this._throttle(function(e){
+            i.addEventListener('mousewheel',this._debounce(function(e){
                 e.preventDefault();
                 this.scrollLeft += e.deltaY > 0 ? 100 : -100 ;
                 scroll._dispatch(func, e);
@@ -98,50 +99,51 @@ const scroll = {
 
     /**
      * 스크롤 밑쪽에 있을때
-     * @param {*} selector 
-     * @param {*} func 
+     * @param {*} selector
+     * @param {*} func
      * @param {*} per
-     * @returns 
+     * @returns
      */
-    down: function( selector, func, per = 0.5 ){
+    down: function( selector, func, ms = 200, per = 0.5 ){
         // 확인, 가공
         let target = this._check(selector);
 
         for (const i of target)
         {
-            i.addEventListener('mousewheel',this._throttle((e)=>{
+            i.addEventListener('mousewheel',this._debounce((e)=>{
                 let len = (i.scrollHeight - i.offsetHeight) 
                     || document.documentElement.scrollHeight - window.innerHeight;
-                let top = i.scrollTop || document.documentElement.scrollTop;
+                let top = i.scrollTop || window.scrollY ;
+                // 이거 값 안바뀜 || document.documentElement.scrollTop
 
                 if ( top / len > per )
                     scroll._dispatch(func, e);
-            }));
+            }, ms));
         }
     },
 
     /**
      * 스크롤 위쪽에 있을때
      * @fix 스크롤 down이랑 같은 판별이라 확인필요
-     * @param {*} selector 
-     * @param {*} func 
+     * @param {*} selector
+     * @param {*} func
      * @param {*} per
-     * @returns 
+     * @returns
      */
-    up: function( selector, func, per = 0.5 ){
+    up: function( selector, func, ms = 200, per = 0.5 ){
         // 확인, 가공
         let target = this._check(selector);
 
         for (const i of target)
         {
-            i.addEventListener('scroll',this._throttle((e)=>{
+            i.addEventListener('scroll',this._debounce((e)=>{
                 let len = (i.scrollHeight - i.offsetHeight) 
                     || document.documentElement.scrollHeight - window.innerHeight;
-                let top = i.scrollTop || document.documentElement.scrollTop;
+                let top = i.scrollTop || window.scrollY;
 
                 if ( top / len > per )
                     scroll._dispatch(func, e);
-            }));
+            }, ms));
         }
 
     },
@@ -149,25 +151,25 @@ const scroll = {
 
     /**
      * 스크롤 왼쪽에 있을때
-     * @param {*} selector 
-     * @param {*} func 
+     * @param {*} selector
+     * @param {*} func
      * @param {*} per
-     * @returns 
+     * @returns
      */
-    left: function( selector, func, per = 0.5 ){
+    left: function( selector, func, ms = 200 , per = 0.5 ){
         // 확인, 가공
         let target = this._check(selector);
 
         for (const i of target)
         {
-            i.addEventListener('scroll',this._throttle((e)=>{
+            i.addEventListener('scroll',this._debounce((e)=>{
                 let len = (i.scrollWidth - i.offsetWidth)
                     || document.documentElement.scrollWidth - window.innerHeight;
                 let left = i.scrollLeft || document.documentElement.scrollLeft;
 
                 if ( left / len < per )
                     scroll._dispatch(func, e);
-            }));
+            }, ms));
         }
 
     },
@@ -175,25 +177,25 @@ const scroll = {
 
     /**
      * 스크롤 오른쪽에 있을때
-     * @param {*} selector 
-     * @param {*} func 
+     * @param {*} selector
+     * @param {*} func
      * @param {*} per
-     * @returns 
+     * @returns
      */
-    right: function( selector, func, per = 0.5 ){
+    right: function( selector, func, ms = 200 , per = 0.5 ){
         // 확인, 가공
         let target = this._check(selector);
 
         for (const i of target)
         {
-            i.addEventListener('scroll',this._throttle((e)=>{
+            i.addEventListener('scroll',this._debounce((e)=>{
                 let len = (i.scrollWidth - i.offsetWidth)
                     || document.documentElement.scrollWidth - window.innerHeight;
                 let left = i.scrollLeft || document.documentElement.scrollLeft;
 
                 if ( left / len > per )
                     scroll._dispatch(func, e);
-            }));
+            }, ms));
         }
 
     },
