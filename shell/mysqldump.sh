@@ -1,6 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
-__FILE__=`realpath $0`
+# 현재 파일, 경로 얻기
+if [[ $1 -eq "" ]];then
+    __FILE__=`realpath $0`
+else
+    __FILE__=`realpath $1`
+fi
 __DIR__=`dirname $__FILE__`
 __LIB__=${__DIR__}/lib
 
