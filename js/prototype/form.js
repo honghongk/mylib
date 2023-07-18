@@ -40,7 +40,8 @@ HTMLFormElement.prototype.object = function(){
         // 키 분할
         let match = k.match(patterns.key),
             merge = v,
-            reverse_key = k;
+            reverse_key = k,
+            key;
 
         // 뒤에서부터 뽑고 입력
         while ( (key = match.pop()) !== undefined )
