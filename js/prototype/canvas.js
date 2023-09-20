@@ -214,10 +214,31 @@ HTMLCanvasElement.prototype.upload = function(){
 }
 
 
+/**
+ * 캔바스 안의 이미지를 다운로드 한다
+ * @param {String} name 파일이름
+ */
+HTMLCanvasElement.prototype.download = function(name){
+    if ( typeof name != 'string')
+        name = 'canvas.png';
+
+    let ext = name.split('.').pop();
+    if ( ext != 'png' )
+        name += 'png';
+
+    let link = $('a')[0];
+    link.download = name;
+    link.href = this.canvas.toDataURL();
+    link.click();
+    link.remove();
+};
 
 
 
 
+
+
+// 아래는 그림판 처럼 그리는거
 
 // let paint = {
 //     pos: {
