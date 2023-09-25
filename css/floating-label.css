@@ -1,0 +1,26 @@
+/* 둥둥라벨 */
+input + label{
+    position: absolute;
+    display: block;
+    pointer-events: none;
+    background-color: var(--input-bg);
+
+    /* left top 설정은 위치가 최상위로 되어버림 */
+    transform: translateX(0.3em) translateY(-1.6em);
+    transition: transform .1s ease-in-out
+        , background-color .1s ease-in-out
+        , font-size .1s ease-in-out;
+}
+/* input[placeholder]:not(:placeholder-shown) + label, */
+input:not(:placeholder-shown) + label,
+input:focus + label
+{
+    background-color: var(--bg);
+    font-size: 0.8em;
+    transform: translateX(0.3em) translateY(-5em);
+    /* opacity: 0.8; */
+    transition: transform 0.1s ease-in-out
+        , font-size .1s ease-in-out
+        , background-color .1s ease-in-out
+        , opacity .1s ease-in-out;
+}
