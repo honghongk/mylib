@@ -1,0 +1,54 @@
+*{
+    text-wrap: balance;
+}
+
+/* 스타일먹이기 쉽게하기 */
+html, body, main{
+    width: 100%;
+    /* height: 100%; */
+    margin: 0;
+    padding: 0;
+}
+
+a, button, input[type=radio],input[type=checkbox]{
+    cursor: pointer;
+}
+
+a, button, input, select{
+    padding: 0.3em;
+    
+    font-size: 1rem;
+    font-weight: 400;
+    text-decoration: none;
+    text-align: center;
+    
+    color: var(--black);
+    background-color: var(--white);
+    border: 1px solid var(--white);
+    border-radius: 2px;
+    
+}
+input{
+    text-align: start;
+    background-color: var(--input-bg);
+    width:100%;
+}
+
+ul,li{
+    list-style-type: none;
+    padding:0;
+    margin:0;
+}
+
+a,label,li{
+    display: inline-block;
+}
+input[type=text],
+input[type=email],
+input[type=password],
+label,
+select
+{
+    box-shadow: 0,0,4px,var(--blue);
+    font-size: 1.1em;
+}
