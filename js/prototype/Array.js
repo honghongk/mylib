@@ -1,24 +1,6 @@
 'use strict';
 
 /**
- * https://7942yongdae.tistory.com/96
- * 배열 섞기
- * @return Array
- */
-Array.prototype.shuffle = function(){
-  returnthis.sort(()=> Math.random() - 0.5);
-};
-
-/**
- * 배열 무작위 value 빼기
- * @return Array
- */
-Array.prototype.random = function(){
-  return this.shuffle.pop();
-};
-
-
-/**
  * 큰 수 부터 나열 sort 거꾸로
  * @returns {Array}
  */
@@ -68,5 +50,21 @@ Array.prototype.symmetric = function(){
             )
         );        
     });
+    return res;
+};
+
+/**
+ * 다차원 array를 1차원으로 바꿔준다
+ * @returns {Array}
+ */
+Array.prototype.flat = function(){
+    let res = [];
+    for (let v of this)
+    {
+        if ( v instanceof Array )
+            res.push(... v.flat());
+        else
+            res.push(v);
+    }
     return res;
 };
