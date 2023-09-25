@@ -78,6 +78,8 @@ class Logger
         foreach ($scan as $f)
         {
             $file = self::$dir.DIRECTORY_SEPARATOR.$f;
+            if ( ! is_file ( $file ) )
+                continue;
 
             // 시간계산 초 -> 일
             $t = (microtime(true) - filemtime($file)) / 86400 ;
