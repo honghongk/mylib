@@ -7,6 +7,41 @@
  */
 class Arr
 {
+
+    static function pop ( array &$arr, $key = [] )
+    {
+        if ( empty ( $key ) )
+            return array_pop($arr);
+        $res = [];
+        foreach ($key as $k) {
+            $res[$k] = $arr[$k];
+            unset($arr[$k]);
+        }
+        return $res;
+    }
+
+    /**
+     * 순서대로 재배치
+     */
+    static function sort ( array $arr, array $key = [] )
+    {
+        if ( empty ( $key ) )
+        {
+            sort($arr);
+            return $arr;
+        }
+        
+        // 재배치 있는 순서대로 맨앞으로
+        $res = [];
+        foreach ($key as $k)
+        {
+            $res[$k] = $arr[$k];
+            unset($arr[$k]);
+        }
+        return array_merge($res,$arr);
+    }
+
+
      /**
      * 랜덤으로 흩뜨리기
      * @param float 평균값
@@ -16,7 +51,7 @@ class Arr
      * @param int 소수점 자리수
      * @return array 흩트러진 값
      */
-    function array_pad_dispersion( $avg, $pad, $min, $max , $precision = 3 )
+    static function pad_dispersion( $avg, $pad, $min, $max , $precision = 3 )
     {
         $total = $avg * $pad;
         $res = array_pad([], $pad, 0);
@@ -38,66 +73,6 @@ class Arr
         },$res);
     }
 
-
-    /**
-     * 키의 데이터 기준으로 정렬
-     * @fix 다차원 배열은 나중에
-     * @param array 2차 배열
-     * @param string|array 1차 키
-     * @return array
-     */
-    static function rsort($arr, $key)
-    {
-        if ( is_string($key))
-            $key = [$key];
-
-        $order = [];
-        foreach ($arr as $v) {
-            $str = '';
-            foreach ($key as $k)
-                $str .= $v[$k];
-            if ( ! isset ( $order[$str] ) )
-                $order[$str] = [];
-            $order[$str][] = $v;
-        }
-        krsort($order);
-
-        $res = [];
-        foreach ($order as $v)
-            foreach ( $v as $vv )
-                $res[] = $vv;
-        return $res;
-    }
-
-    /**
-     * 키의 데이터 기준으로 정렬
-     * @fix 다차원 배열은 나중에
-     * @param array 2차 배열
-     * @param string|array 1차 키
-     * @return array
-     */
-    static function sort($arr, $key)
-    {
-        if ( is_string($key))
-            $key = [$key];
-
-        $order = [];
-        foreach ($arr as $v) {
-            $str = '';
-            foreach ($key as $k)
-                $str .= $v[$k];
-            if ( ! isset ( $order[$str] ) )
-                $order[$str] = [];
-            $order[$str][] = $v;
-        }
-        ksort($order);
-
-        $res = [];
-        foreach ($order as $v)
-            foreach ( $v as $vv )
-                $res[] = $vv;
-        return $res;
-    }
 
     /**
      * k => v 인지 확인
@@ -131,14 +106,14 @@ class Arr
     static function flat ( $arr )
     {
         if (!is_array($arr))
-                return $arr;
+            return $arr;
         $res = array();
         foreach ($arr as $k => $v)
         {
             if ( is_array ( $v ) )
-                    $res = array_merge ( $res , self::flat ( $v ) ) ;
+                $res = array_merge ( $res , self::flat ( $v ) ) ;
             else
-                    $res[$k] = $v;
+                $res[$k] = $v;
         }
 
         return $res;
@@ -174,19 +149,19 @@ class Arr
      * @param array 배열
      * @return int 배열 깊이
      */
-	static function depth ( $arr )
-	{
-		if ( ! is_array ( $arr ) )
-			return 0 ;
-		$res = 1 ;
-		foreach ( $arr as $v )
-		{
-			if ( is_array ( $v ) )
-				$depth = self::depth ( $v ) + 1 ;
-			if ( isset ( $depth ) && $depth > $res )
-				$res = $depth ;
-		}
-		return $res ;
-	}
+    static function depth ( $arr )
+    {
+        if ( ! is_array ( $arr ) )
+            return 0 ;
+        $res = 1 ;
+        foreach ( $arr as $v )
+        {
+            if ( is_array ( $v ) )
+                $depth = self::depth ( $v ) + 1 ;
+            if ( isset ( $depth ) && $depth > $res )
+                $res = $depth ;
+        }
+        return $res ;
+    }
 
 }
