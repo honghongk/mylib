@@ -1,0 +1,10 @@
+/* 네이밍 어케할까 */
+.glow{
+    box-shadow: 0 0 1em 1em var(--blue);
+}
+
+/* 네이밍 어케할까 */
+.border-grad{
+    border-image: linear-gradient(to right, blue 0%, purple 100%);
+    border-image-slice: 1;
+}
