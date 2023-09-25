@@ -1,0 +1,32 @@
+
+/* 폼 기본스타일 */
+form{
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 5%;
+    margin: 0;
+}
+form:not(.row) > *{
+    margin-bottom: 2em;
+}
+form.row{
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 3%;
+    /* padding: 5%; */
+    margin: 0;
+
+}
+form div{
+    width: 100%;
+}
+
+form label + input {
+    margin-top: 0.3em;
+}
