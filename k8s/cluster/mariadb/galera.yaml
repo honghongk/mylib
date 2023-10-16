@@ -1,0 +1,377 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  namespace: test-honghong
+  name: sample-mariadb-galera
+type: Opaque
+stringData:
+  password: mariadbPassword
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-mariadb-galera
+  namespace: test-honghong
+  labels:
+    app: db
+data:
+  same.cnf: |
+
+    !includedir /etc/mysql/conf.d 
+    [client]
+    default-character-set = utf8mb4
+
+    [mysql]
+    default-character-set = utf8mb4
+
+    [mysqld]
+    user = mysql
+    bind-address = 0.0.0.0
+
+    character-set-client-handshake = FALSE
+    character-set-server           = utf8mb4
+    collation-server               = utf8mb4_unicode_ci
+    init_connect                    = set collation_connection=utf8mb4_general_ci
+    init_connect                    = set names utf8mb4
+
+    #https://jojoldu.tistory.com/461
+    #시간대 설정
+    default-time-zone=+9:00
+
+    #타임아웃 설정
+    interactive_timeout             = 60
+
+    #로그 폴더 설정
+    #슬로우 쿼리 / 에러
+    expire_logs_days                = 30
+
+    log-error                       = /var/log/mysql/error.log
+
+
+    # 쿼리 로그
+    slow_query_log                  = 1
+    long_query_time                 = 5
+    slow_query_log_file             = /var/log/mysql/slow-query.log
+    log_slow_rate_limit = 1
+    log_slow_verbosity = query_plan
+    log_slow_admin_statements
+
+    #용량 제한
+    tmp_table_size = 256M
+    max_heap_table_size = 256M
+    # 이노디비 관련
+    # 트랜잭션 잘못걸면 파일차지를 많이함
+    innodb_data_file_path = ibdata1:12M:autoextend:max:1G
+
+    # 네트워크
+    max-connections = 1000
+    max-allowed-packet = 4M
+    connect-timeout = 5
+    wait-timeout = 10
+    tcp-keepalive-time = 10
+
+  galera.cnf: |
+    [galera]
+    wsrep_on                 = ON
+    wsrep_provider           = /usr/lib/galera/libgalera_smm.so
+    binlog_format            = row
+    default_storage_engine   = InnoDB
+
+    # mariabackup이 제일 최신좋은거라는듯
+    # rsync, mysqldump, xtrabackup, xtrabackup-v2, mariabackup
+    wsrep_sst_method         = mariabackup
+    wsrep_sst_auth           = root:mariadbPassword
+
+    innodb_autoinc_lock_mode = 2
+    bind-address = 0.0.0.0
+
+    # init container에서 추가하는거로
+    # wsrep_cluster_name       = ""
+
+    # 이거 첫노드에는 비웠다가 다시 생성될때는 차있어야한다는데
+    # wsrep_cluster_address    = "gcomm://"
+    # wsrep_node_address="node1:4567"
+
+
+---
+
+# proxysql 쓸거라 서비스 안쓰기
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: sample-mariadb-galera
+#   namespace: test-honghong
+#   labels:
+#     app: db
+# spec:
+#   ports:
+#   - name: sample-mariadb-galera
+#     port: 3306
+#   # clusterIP: None
+#   selector:
+#     app: db
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sample-mariadb-galera
+  namespace: test-honghong
+spec:
+  selector:
+    matchLabels:
+      app: db
+  # serviceName: sample-mariadb-galera
+  replicas: 5
+  # podManagementPolicy: OrderedReady
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      terminationGracePeriodSeconds: 10
+      # https://kubernetes.io/ko/docs/concepts/scheduling-eviction/topology-spread-constraints/
+      # 분배 제약 조건
+      # topologySpreadConstraints:
+      # - maxSkew: 1
+      #   topologyKey: "topology.kubernetes.io/zone"
+      #   whenUnsatisfiable: DoNotSchedule
+      #   labelSelector:
+      #     matchLabels:
+      #       app: db
+      # affinity:
+      #   podAntiAffinity:
+      #     requiredDuringSchedulingIgnoredDuringExecution:
+      #     - labelSelector:
+      #         matchExpressions:
+      #         - key: app
+      #           operator: In
+      #           values:
+      #           - mysql
+      #       topologyKey: "kubernetes.io/hostname"
+
+      initContainers:
+      # 서버 아이디 배정, 마스터 슬레이브 config 수정
+      - name: sample-init-mariadb
+        image: mariadb:11.1.1-rc-jammy
+        imagePullPolicy: IfNotPresent
+        
+        command:
+        - bash
+        - "-c"
+        - |
+          set -ex
+
+          # 갈레라 노드 설정
+          CONFIG=/etc/mysql/conf.d/galera-node.cnf
+          # 데이터 폴더
+          DATA=/var/lib/mysql
+
+          # 이미 세팅되어있는지 확인
+          CHECK=(`ls $DATA`)
+
+          echo "[galera]" > $CONFIG
+
+          # 네임스페이스 값 가져오기
+          NAMESPACE=`cat /var/run/secrets/kubernetes.io/serviceaccount/namespace`
+
+          # 현재 포드 아이피
+          MYIP=`echo $(cat /etc/hosts|grep $NAMESPACE)|cut -d' ' -f1`
+
+          # 전체 호스트이름 가져오기
+          FULL_HOST=`echo $(cat /etc/hosts|grep $NAMESPACE)|cut -d' ' -f2`
+          
+          # 전체에서 겹치는 문자빼고
+          SUFFIX=${FULL_HOST#$HOSTNAME}
+
+          # 앞쪽 이름 얻기
+          [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]] || exit 1
+          PREFIX=${BASH_REMATCH[1]}
+          ORDINAL=${BASH_REMATCH[2]}
+
+          # 서버 아이디 세팅
+          echo [mysqld] > /etc/mysql/conf.d/server-id.cnf
+          echo server-id=$((100 + $ORDINAL)) >> /etc/mysql/conf.d/server-id.cnf
+
+          # 클러스터이름, 노드 세팅
+          echo "wsrep_node_name=\"$HOSTNAME\"" >> $CONFIG
+          echo "wsrep_cluster_name       = \"$PREFIX\"" >> $CONFIG
+
+          # 한줄로 담기
+          ARR=()
+
+          # 루프 끝번호는 sts replica 수만큼
+          for v in {0..6};do
+            HOST="${PREFIX}-${v}${SUFFIX}"
+            
+            if [[ $v -eq $ORDINAL ]];then
+              # echo wsrep_node_address     = \"$HOST\" >> $CONFIG
+              echo wsrep_node_address     = \"$MYIP\" >> $CONFIG
+            fi
+
+            ARR+=(${PREFIX}-${v}${SUFFIX})
+          done
+
+          # 쉼표로 연결하고 설정 적용
+          ARR=$(printf ",%s" "${ARR[@]}")
+          ARR=${ARR:1}
+
+          
+          # 클러스터 캐싱정보 남아있는거 지우고 실행
+          rm -f /var/lib/mysql/grastate.dat
+          rm -f /var/lib/mysql/galera.cache
+          # 첫번째 노드는 빈거로
+          if [[ $ORDINAL -eq 0 ]];then
+            echo "wsrep_cluster_address    = \"gcomm://\"" >> $CONFIG
+          else
+            echo "wsrep_cluster_address    = \"gcomm://${ARR}\"" >> $CONFIG
+          fi
+          
+        volumeMounts:
+        - name: dir
+          mountPath: /etc/mysql/conf.d
+        - name: data
+          mountPath: /var/lib/mysql
+        - name: galera
+          mountPath: /etc/mysql/conf.d/galera.cnf
+          subPath: galera.cnf
+        - name: conf
+          mountPath: /mnt/mysql
+
+      containers:
+      - name: mariadb-galera
+        image: mariadb:11.1.1-rc-jammy
+        imagePullPolicy: IfNotPresent
+        # lifecycle:
+        #   postStart:
+        #     exec:
+        #       command: ["/usr/bin/galera_recovery"]
+        #       command: ["/bin/bash", "-c", "/usr/bin/galera_recovery", "mariadb@$HOSTNAME"]
+        #       command: ["/usr/sbin/mariadbd" , "--wsrep_recover"]
+        #       command: ["/bin/bash", "-c","apt update -y; apt install -y net-tools"]
+        #       command: ["/bin/bash", "-c","mariadb -uroot -p$MARIADB_ROOT_PASSWORD -e"]
+        env:
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sample-mariadb-galera
+              key: password
+        # - name: MARIADB_ALLOW_EMPTY_PASSWORD
+        #   value: "1"
+        # - name: MARIADB_ROOT_HOST
+        #   value: '%'
+        
+        ports:
+        - name: mariadb-galera
+          containerPort: 3306
+        - name: galera-sst
+          containerPort: 4567
+        # resources:
+        #   requests:
+        #     cpu: 500m
+        #     memory: 500Mi
+        #     # ephemeral-storage: "1Gi"
+        #   limits:
+        #     cpu: 500m
+        #     memory: 500Mi
+        #     # ephemeral-storage: "1Gi"
+        # livenessProbe:
+        #   exec:
+        #     command:
+        #     - bash
+        #     - "-c"
+        #     - |
+        #       mariadb-admin -uroot -p$MARIADB_ROOT_PASSWORD ping
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        #   periodSeconds: 10
+        #   initialDelaySeconds: 5
+        #   timeoutSeconds: 5
+        # readinessProbe:
+        #   exec:
+        #     command: ["mariadb","-uroot", "-p$MARIADB_ROOT_PASSWORD", "-e", "SELECT 1"]
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
+        #   timeoutSeconds: 5
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+          subPath: mysql
+        - name: conf
+          mountPath: /etc/mysql/my.cnf
+          subPath: my.cnf
+          readOnly: true
+        - name: galera
+          mountPath: /etc/mysql/conf.d/galera.cnf
+          subPath: galera.cnf
+          readOnly: true
+        - name: dir
+          mountPath: /etc/mysql/conf.d
+        resources:
+          requests:
+            cpu: 500m
+            memory: 500Mi
+            # ephemeral-storage: "1Gi"
+          limits:
+            cpu: 500m
+            memory: 500Mi
+            # ephemeral-storage: "1Gi"
+      volumes:
+      - name: dir
+        emptyDir: {}
+      - name: conf
+        configMap:
+          name: sample-mariadb-galera
+          items:
+          - key: same.cnf
+            path: my.cnf
+      - name: galera
+        configMap:
+          name: sample-mariadb-galera
+          items:
+          - key: galera.cnf
+            path: galera.cnf
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 2
+  volumeClaimTemplates:
+  - metadata:
+      namespace: test-honghong
+      name: data
+      labels:
+        app: db
+    spec:
+      storageClassName: nfs-csi
+      accessModes: ["ReadWriteOnce"]
+      # accessModes: ["ReadWriteMany"]
+
+      # pv 만 되나
+      # Retain Delete Recycle  리사이클은 deprecated
+      # persistentVolumeReclaimPolicy: Retain
+      resources:
+        requests:
+          storage: 10Gi
+          # iops: 1M
+
+
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sample-mariadb-galera
+  namespace: test-honghong
+spec:
+  maxReplicas: 10
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: sample-mariadb-galera
+  targetCPUUtilizationPercentage: 80
