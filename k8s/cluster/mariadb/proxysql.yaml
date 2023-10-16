@@ -1,0 +1,311 @@
+# docker pull proxysql/proxysql:2.5.3
+
+# https://github.com/sysown/proxysql
+# https://hub.docker.com/r/proxysql/proxysql
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: proxysql
+  namespace: test-honghong
+spec:
+  accessModes: ["ReadWriteMany"]
+  storageClassName: "nfs-csi"
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: test-honghong
+  name: proxysql
+data:
+  proxysql.cnf: |
+    datadir="/var/lib/proxysql"
+    errorlog = "/var/lib/proxysql.log"
+
+    admin_variables=
+    {
+        admin_credentials   = "admin:admin;radmin:radmin"
+        mysql_ifaces        = "0.0.0.0:6032;/run/proxysql.sock"
+        # refresh_interval  = 2000
+        # debug             = true
+    }
+
+    mysql_variables=
+    {
+        threads                      = 4
+        max_connections              = 2048
+        default_query_delay          = 0
+        default_query_timeout        = 36000000
+        have_compress                = true
+        poll_timeout                 = 1000
+        interfaces                   = "0.0.0.0:3306"
+        default_schema               = "information_schema"
+        stacksize                    = 1048576
+        server_version               = "5.5.30"
+        connect_timeout_server       = 1000
+        monitor_username             = "root"
+        monitor_password             = "mariadbPassword"
+        monitor_history              = 600000
+        monitor_connect_interval     = 60000
+        monitor_ping_interval        = 10000
+        monitor_read_only_interval   = 1500
+        monitor_read_only_timeout    = 500
+        ping_interval_server_msec    = 120000
+        ping_timeout_server          = 500
+        commands_stats               = true
+        sessions_sort                = true
+        connect_retries_on_failure   = 3
+    }
+
+    mysql_servers =
+    (
+        {
+            # 주소나 유닉스소켓  도메인은??
+            address             = "sample-mariadb-galera-0.sample-mariadb-galera.test-honghong.svc.cluster.local"
+            port                = 3306
+            hostgroup           = 0
+            # status              = "ONLINE"
+            # weight              = 1
+            # compression         = 0
+            # max_connections     = 200
+            # max_replication_log = 0
+        },
+        {
+            address             = "sample-mariadb-galera-1.sample-mariadb-galera.test-honghong.svc.cluster.local"
+            port                = 3306
+            hostgroup           = 0
+        },
+        {
+            address             = "sample-mariadb-galera-2.sample-mariadb-galera.test-honghong.svc.cluster.local"
+            port                = 3306
+            hostgroup           = 0
+        },
+        {
+            address             = "sample-mariadb-galera-3.sample-mariadb-galera.test-honghong.svc.cluster.local"
+            port                = 3306
+            hostgroup           = 0
+        },
+        {
+            address             = "sample-mariadb-galera-4.sample-mariadb-galera.test-honghong.svc.cluster.local"
+            port                = 3306
+            hostgroup           = 0
+        },
+    )
+
+    mysql_users:
+    (
+        {
+            username            = "root"
+            password            = "mariadbPassword"
+            default_hostgroup   = 0
+            active              = 1
+            max_connections     = 1000
+            # default_schema      = "test"
+        }
+    )
+
+    mysql_query_rules:
+    (
+        # {
+        #     rule_id               = 1
+        #     active                = 1
+        #     match_pattern         = "^SELECT .* FOR UPDATE$"
+        #     destination_hostgroup = 0
+        #     apply                 = 1
+        # },
+        # {
+        #     rule_id               = 2
+        #     active                = 1
+        #     match_pattern         = "^SELECT"
+        #     destination_hostgroup = 0
+        #     apply                 = 1
+        # },
+    )
+
+    scheduler = 
+    (
+        # {
+        #     id            = 1
+        #     active        = 0
+        #     interval_ms   = 10000
+        #     # 쌍따옴표로 감싸여야됨
+        #     filename      = "/var/lib/proxysql/proxy_galera_cheker.sh"
+        #     arg1          = 0
+        #     arg2          = 0
+        #     arg3          = 0
+        #     arg4          = 1
+        #     arg5          = "/var/lib/proxysql/proxysql_galera_checker.log"
+        # }
+    )
+
+    mysql_replication_hostgroups=
+    (
+        # {
+        #     writer_hostgroup = 30
+        #     reader_hostgroup = 40
+        #     commnet          = "test repl 1"
+        # },
+        # {
+        #     writer_hostgroup = 50
+        #     reader_hostgroup = 60
+        #     commnet          = "test repl 2"
+        # },
+    )
+
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxysql
+  namespace: test-honghong
+  labels:
+    app: proxysql
+spec:
+  # clusterIP: 10.96.0.2
+  type: NodePort
+  # type: ClusterIP
+  ports:
+  # 프록시 서버세팅
+  # - port: 6032
+  #   # 안찍으면 랜덤
+  #   # nodePort: 30000
+  #   targetPort: 6032
+  #   protocol: TCP
+  #   name: proxysql-admin
+
+  # mysql 프록시 연결
+  - port: 6033
+    # 안찍으면 랜덤
+    # nodePort: 30000
+    targetPort: 3306
+    protocol: TCP
+    name: proxysql-mysql
+  selector:
+    app: proxysql
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxysql
+  namespace: test-honghong
+  labels:
+    app: proxysql
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: proxysql
+  template:
+    metadata:
+      labels:
+        app: proxysql
+    spec:
+      restartPolicy: Always
+      affinity:
+        nodeAffinity:
+          # 우선순위 노드 없으면 아무데나
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - proxy
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: proxysql
+        image: proxysql/proxysql:2.5.3
+        imagePullPolicy: IfNotPresent
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/proxysql.cnf
+          name: conf
+          subPath: proxysql.cnf
+        - mountPath: /var/lib/proxysql
+          name: data
+        ports:
+        - containerPort: 6032
+          protocol: TCP
+        # livenessProbe:
+        #   tcpSocket:
+        #     port: 6379
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 10
+        #   timeoutSeconds: 1
+        # readinessProbe:
+        #   tcpSocket:
+        #     port: 6379
+        #   successThreshold: 1
+        #   failureThreshold: 3
+        #   initialDelaySeconds: 10
+        #   periodSeconds: 10
+        #   timeoutSeconds: 1
+        # lifecycle:
+        #   postStart:
+        # resources:
+        #   limits:
+        #     memory: 16Mi
+        #     cpu: 100m
+        #     # ephemeral-storage: "2Gi"
+        #   requests:
+        #     memory: 16Mi
+        #     cpu: 100m
+        #     # ephemeral-storage: "2Gi"
+      
+      volumes:
+      - name: conf
+        configMap:
+          name: proxysql
+          items:
+          - key: proxysql.cnf
+            path: proxysql.cnf
+      - name: data
+        persistentVolumeClaim:
+          claimName: proxysql
+
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: proxysql
+  namespace: test-honghong
+  labels:
+    app: proxysql
+spec:
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: cpu 
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: proxysql
