@@ -1,0 +1,707 @@
+
+
+---
+
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: sample-nginx
+  namespace: test-honghong
+data:
+  # 인증서파일 개행포함 통째로 base64
+  # kubectl create secret tls tls-test --key domain.com.key --cert domain.com.crt
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURsVENDQW4yZ0F3SUJBZ0lVS3huc24xc0N2VUhiRit4dDM5UHowT1IwZGI4d0RRWUpLb1pJaHZjTkFRRUwKQlFBd1dqRUxNQWtHQTFVRUJoTUNTMUl4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeElUQWZCZ05WQkFvTQpHRWx1ZEdWeWJtVjBJRmRwWkdkcGRITWdVSFI1SUV4MFpERVRNQkVHQTFVRUF3d0taRzl0WVdsdUxtTnZiVEFlCkZ3MHlNekEyTXpBd01qSTBNamxhRncweU16QTNNekF3TWpJME1qbGFNRm94Q3pBSkJnTlZCQVlUQWt0U01STXcKRVFZRFZRUUlEQXBUYjIxbExWTjBZWFJsTVNFd0h3WURWUVFLREJoSmJuUmxjbTVsZENCWGFXUm5hWFJ6SUZCMAplU0JNZEdReEV6QVJCZ05WQkFNTUNtUnZiV0ZwYmk1amIyMHdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCCkR3QXdnZ0VLQW9JQkFRQ3gwVnJ1c1loNHJIaElEeUxpZXRiY1psRk5xQnFJZWN6SldaWmV4YlNBS2VNY0FJTXEKRXJ4WCt6RGkxR3kwdXMxMnVBNllva3YwblpuTWdYV0ljTjQwcnZCa09HeWozK1dIZVdMVDhLTVZtR1Evc1JlaQovTkVlRVJhaHpVWEpnV2hQVXA1cHVMajdMUGIxSDBtekNWQWovQWE1T1RlK05TdlE2d2pjM0tVYmVValE0K3NrCnRmSWRpc1A0bVlQbTIrbnRPM3BuQzhsaWRjSmZtdm80UHE5aklqYjMxSVVhR0tmU294SURxbC92eVM2Z0w3ZngKUU1PczdEWGRZMWFzY1pHTXRTOTVaNUdWN2oxczg1azhjdE5rODAzYWZxNnM1WjgyZHpubUMveE9CVTJ6cGNzOApOTWhMbmtPaXRTS3NlV0RXSXVvTlJ0SEs4R2w2enowRWZGWHRBZ01CQUFHalV6QlJNQjBHQTFVZERnUVdCQlRjCmpFMThTNjMxek4xNEgyN2QvNDk5RGZQQ0VUQWZCZ05WSFNNRUdEQVdnQlRjakUxOFM2MzF6TjE0SDI3ZC80OTkKRGZQQ0VUQVBCZ05WSFJNQkFmOEVCVEFEQVFIL01BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQjVKOHFIYVpkawo2QVQxcWpPTU9FZVArY3g4bjZLVThYWW9GelFDSHc3ZU5hTUM5UXMrN3pPRlRTb1M0YUdqVHVNVkE5aE1qMVFPCnk0Z2NyemhSbGJjcnkwQjRGejhwMXdnNHIyMzFHRmg2UTBWTHZkUEZ1UnRsZGh4M1FDTTk0T0FZYlFDMEhnN3gKSzFNZ3dZZ283NzdYeXFBMzhRNVBpeEZjQmFTK3k0TmlwZUZveXR1d3pjT29uSlFBWDJPVHhZWlZUTEg1VzczRQowMFVwM3krNEVWd28ra0lRV3F1V3lEd2xMUmJKcmRhN1lmZVJRSHlKOXFjUExaTkFtZm5kNGFLWnFaTXkrVWRUCmVRZlA4WGRRUGNhbVhvKzdsSytsTEpSenRaNTgwVzdPbExqdGFZVE9XSUV5Q1VyVWVhT21jMXhBQUVsQUZEekoKWXNCamN6cjVkaVNHCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktZd2dnU2lBZ0VBQW9JQkFRQ3gwVnJ1c1loNHJIaEkKRHlMaWV0YmNabEZOcUJxSWVjekpXWlpleGJTQUtlTWNBSU1xRXJ4WCt6RGkxR3kwdXMxMnVBNllva3YwblpuTQpnWFdJY040MHJ2QmtPR3lqMytXSGVXTFQ4S01WbUdRL3NSZWkvTkVlRVJhaHpVWEpnV2hQVXA1cHVMajdMUGIxCkgwbXpDVkFqL0FhNU9UZStOU3ZRNndqYzNLVWJlVWpRNCtza3RmSWRpc1A0bVlQbTIrbnRPM3BuQzhsaWRjSmYKbXZvNFBxOWpJamIzMUlVYUdLZlNveElEcWwvdnlTNmdMN2Z4UU1PczdEWGRZMWFzY1pHTXRTOTVaNUdWN2oxcwo4NWs4Y3ROazgwM2FmcTZzNVo4MmR6bm1DL3hPQlUyenBjczhOTWhMbmtPaXRTS3NlV0RXSXVvTlJ0SEs4R2w2Cnp6MEVmRlh0QWdNQkFBRUNnZ0VBVnVLRGFvYy90aXNidUtZQXR5WXJqMVRGWEVzTDcreUh4a2lxZzFOYUw1ZUgKKzVvNmZOZmJ4S2VkeXUvZHorOUl6cjMvajlBWmlnUnA3blhCVHJKTHVQVlR5N3lRUlFCMVFGMXREejhSQ00vRwpDQ01KZUIvTk5FSklTellvWjkzOThHaGZ0Q3ZJNHg0azZ6L20vSDdMOUZGRW5jT1orNnd5WlNvNjBlUlVIcGd6ClIyNFk2bzhlNHk2RTVtU3NURkh1Vm1CMHVPSU13U1JaN1ZYSGoxc093MmRFREZWWTU4djFrNFJ5T28zdUsybzMKZGdEdFRpdmVuUkVuRXhpWHQ1OWlJRjUvZFVXTVliUDZrSGxXZ0o1RnpNTC9DZ3Y3d080U3ZPNXdZbk90aG5jTwpUTG5YdmhGS0ZzcHRRZzB4RVQ0U1U3cWxXUXJVODk2UzBoSy9PR0xkOXdLQmdRRGgyV1F0ek1pWkQrQm42YkI3CmF5ZGUvSXphMHIwcDlEQUdQdWdEWDMzcWlxWERlS2lsUjErdXFYUmZtbWtmWXQxWGR2a2FQelp1VkZCMlR0OW8KZTZKSm1yLzUwUjBSY2txRGJ5YWVBQVJSU21XU1NXWjBTVzBBRUpJbUJNbE1TYjBiRHJwK1g5cWk1L256SkkvQgpyWjBnS2gxaUJDakE3SU1wUnFWN09VRGtJd0tCZ1FESmpuSWlhVUV4ZnFtcTNSQ1RaOVZZcmxpdTJJdUN5QWRJClFIQnBjT2V6V3JDN0ZPWWhJdFRRa2RFUWxiNEo0dHFPd0FsRDhoODFXMnlkeERkY25INUFoQytnTzNlczhST0QKaDdOVjZxbTRJQjZPY3oxTXMwdmpSYWV6eU13VlNNMGJNOU5WVmVQeXFneFlTcHhUaUpZZkVydk5lQ05RY2xDSAppMStOaG9zMnJ3S0JnQk9ycDNvRnVBTDh5d0xCNjhrVUVCM0p5VXJWeC92N2RLTlduMGFMN3ArYTY4MFdtVG1yCitiMXdyTjRXeU1rZkIwQXk4SWRFc2l6eDB3QTY1bUpuUWo4KzV6R084UVV2K3lWdmJPR2VCc0k5eEpMMUthTS8KTWVzcmhrOGhZNWJ0WlRjU0ZWUWtiUnA3TWQzbmRVM2RIUzVML0xzb3VaUDBCWWgyeXJyc3hhWVpBb0dBRDV1agpSUHpubW9DWGZPNi9nTnF5ajdwNGpabWhQQkJuVi9YOWZuekt4SDNLWDhKZmk4Tlp2WWo5S282ZDk4QUVjcmQyClFEZTRxUFlhZENFa3RGdzkvcHI5NFNlWnZkK3hSaWMxQVBzNkIxTWRhcVNMNDZ1aXZjZkFFOUVCMU1nZGNmVFMKY2JKRUE1K2RjeHpiL0RBQWlBbDRWNUh0RWlhNEM3Y0VRRDVoKzJzQ2dZQi9RRWZXS0tHMGdpc2VPTHJ5VTh3VQpJSWxPSmZYaDZmbmpqWEYrQUJPZ081MmVxQnorUkgvcG53TjVZc0NwWDZvUmR0VUdIajBxb1Q4dlNLYlMvYUJ6CnptVDJsenVjRngzUlJ0SFIyYXpkeWdKR1R1dlh6b3lzSGFPdzdHNzd3RkJ6YjBJRW13Uk9UUEJRcnB1bnJGdmkKOW5nWENQb05QdEpqNGdBTHYwcEdIUT09Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-nginx
+  namespace: test-honghong
+spec:
+  ingressClassName: nginx
+  # defaultBackend:
+  #   service:
+  #     name: nginx
+  #     port:
+  #       number: 80
+  tls:
+  - hosts:
+    - domain.com
+    secretName: sample-nginx
+  rules:
+  - host: domain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix ## Exact ImplementationSpecific
+        backend:
+          service:
+            name: sample-nginx
+            port:
+              number: 80
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: test-honghong
+  name: sample-nginx
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes auto;
+    pid /run/nginx.pid;
+    include /etc/nginx/modules/*.conf;
+    
+    events {
+    	worker_connections 768;
+    	# multi_accept on;
+    }
+    
+    http {
+    
+    	##
+    	# Basic Settings
+    	##
+    
+    	sendfile on;
+    	tcp_nopush on;
+    	tcp_nodelay on;
+    	types_hash_max_size 2048;
+    	server_tokens off;
+    
+    	# 연결유지
+    	keepalive_timeout 10s;
+    
+    	# 캐싱 커넥션 수 ??
+    	keepalive_requests 10;
+    
+    	# 업로드 용량 많으면 수정해야할듯
+    	client_header_timeout 5s;
+    	client_body_timeout 10s;
+    
+    	# 사이즈
+    	client_max_body_size 20M;
+    	client_body_buffer_size 8K;
+    	large_client_header_buffers 2 8M;
+    
+    	# 데이터 보내는게 많으면 타임아웃
+    	send_timeout 60s;
+    
+    	# 도메인 아이피 찾는거 타임아웃
+    	resolver_timeout 10s;
+    
+    	# 잘 모르겟음
+    	fastcgi_buffers 16 16k;
+    	fastcgi_buffer_size 32k;
+    	fastcgi_read_timeout 10s;
+    
+    	# 프록시
+    	proxy_connect_timeout 10s;
+    	proxy_read_timeout 10s;
+    	proxy_send_timeout 10s;
+    
+    	# server_names_hash_bucket_size 64;
+    	# server_name_in_redirect off;
+    
+    
+    	# 안전하지 않은 암호화 방식 금지
+    	# 밑에 있는거만 쓰라고 하는거인듯
+    	ssl_ciphers EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;
+    
+    	# SSL 설정시 헤더 해줘야함
+    	# add_header Strict-Transport-Security    "max-age=63072000; includeSubdomains; preload";
+    	add_header X-XSS-Protection "1; mode=block";
+    	add_header X-Content-Type-Options   nosniff;
+    	# add_header X-Frame-Options SAMEORIGIN;
+    
+    
+    	# 헤더 숨기기
+    	fastcgi_hide_header X-Powered-By;
+    	fastcgi_hide_header X-Pingback;
+    	fastcgi_hide_header Link;
+    	proxy_hide_header X-Powered-By;
+    	proxy_hide_header X-Pingback;
+    	proxy_hide_header X-Link;
+    
+    
+    	include /etc/nginx/mime.types;
+    	default_type application/octet-stream;
+    
+    	##
+    	# SSL Settings
+    	##
+    
+    	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3; # Dropping SSLv3, ref: POODLE
+    	ssl_prefer_server_ciphers on;
+    
+    	##
+    	# Logging Settings
+    	##
+    
+    	access_log /var/log/nginx/access.log;
+    	error_log /var/log/nginx/error.log;
+    
+    	##
+    	# Gzip Settings
+    	##
+    
+    	gzip on;
+    
+    	gzip_vary on;
+    	gzip_proxied any;
+    	# 압축률 클수록 올라감 1 ~ 9
+    	gzip_comp_level 3;
+    	gzip_buffers 16 8k;
+    	gzip_disable "MSIE [1-6].";
+    	gzip_http_version 1.1;
+    	gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    	gzip_min_length 10240;
+    
+    	##
+    	# Virtual Host Configs
+    	##
+    
+    	include /etc/nginx/conf.d/*.conf;
+    	include /etc/nginx/sites-enabled/*;
+    }
+    
+    
+    #mail {
+    #	# See sample authentication script at:
+    #	# http://wiki.nginx.org/ImapAuthenticateWithApachePhpScript
+    #
+    #	# auth_http localhost/auth.php;
+    #	# pop3_capabilities "TOP" "USER";
+    #	# imap_capabilities "IMAP4rev1" "UIDPLUS";
+    #
+    #	server {
+    #		listen     localhost:110;
+    #		protocol   pop3;
+    #		proxy      on;
+    #	}
+    #
+    #	server {
+    #		listen     localhost:143;
+    #		protocol   imap;
+    #		proxy      on;
+    #	}
+    #}
+
+  server.conf: |
+    server {
+        # listen 80;
+        # server_name domain.com;
+
+        root    /var/www/html/web/public;
+        index   index.html index.php;
+        charset utf-8;
+
+        location = /favicon.ico { access_log off; log_not_found off; }
+        # location = /robots.txt  { access_log off; log_not_found off; }
+        location / {
+            # 특정 메서드만 가능하게
+            # limit_except GET POST {
+            #     deny all;
+            # }
+
+
+            # 디렉토리 리스팅 끄기
+            autoindex off;
+            try_files $uri $uri/ /index.php?$query_string;
+        }
+
+
+        location ~ \.php$ {
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+    }
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: test-honghong
+  name: sample-php-fpm
+data:
+  php-fpm.conf: |
+    [global]
+    error_log = /opt/bitnami/php/logs/php-fpm.log
+    daemonize = yes
+
+    [www]
+    include=/opt/bitnami/php/etc/environment.conf
+    ; 유저, 그룹, listen 유저그룹 포함됨
+    include=/opt/bitnami/php/etc/common.conf
+
+    listen = 9000
+    ; liveness 내부망 핑
+    listen.allowed_clients = 127.0.0.1, 10.0.0.0/8
+    pm = dynamic
+    pm.max_children = 500
+    pm.start_servers = 5
+    pm.min_spare_servers = 5
+    pm.max_spare_servers = 35
+    slowlog = /opt/bitnami/php/logs/www-slow.log
+    php_admin_value[error_log] = /opt/bitnami/php/logs/www-error.log
+    php_admin_flag[log_errors] = on
+    php_value[session.save_handler] = files
+    ; php_value[session.save_path]    = /var/lib/php/session
+    ; php_value[soap.wsdl_cache_dir]  = /var/lib/php/wsdlcache
+  php.ini: |
+    [PHP]
+    engine = On
+    short_open_tag = On
+    precision = 14
+    output_buffering = 4096
+    zlib.output_compression = Off
+    implicit_flush = Off
+    unserialize_callback_func =
+    serialize_precision = 17
+    disable_functions =
+    disable_classes =
+    zend.enable_gc = On
+    expose_php = Off
+    max_execution_time = 5
+    max_input_time = 5
+    memory_limit = 16M
+    error_reporting = E_ALL
+    #error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+    display_errors = On
+    display_startup_errors = On
+    log_errors = On
+    log_errors_max_len = 1024
+    ignore_repeated_errors = Off
+    ignore_repeated_source = Off
+    report_memleaks = On
+    # track_errors = On
+    html_errors = On
+    variables_order = "GPCS"
+    request_order = "GP"
+    register_argc_argv = Off
+    auto_globals_jit = On
+    post_max_size = 20M
+    auto_prepend_file =
+    auto_append_file =
+    default_mimetype = "text/html"
+    default_charset = "UTF-8"
+    doc_root =
+    user_dir =
+    enable_dl = Off
+    file_uploads = On
+    upload_max_filesize = 20M
+    max_file_uploads = 20
+    allow_url_fopen = Off
+    allow_url_include = Off
+    default_socket_timeout = 5
+    [CLI Server]
+    cli_server.color = On
+    [Date]
+    date.timezone ="Asia/Seoul"
+    [filter]
+    [iconv]
+    [intl]
+    [sqlite]
+    [sqlite3]
+    [Pcre]
+    [Pdo]
+    [Pdo_mysql]
+    pdo_mysql.cache_size = 2000
+    pdo_mysql.default_socket=
+    [Phar]
+    [mail function]
+    sendmail_path = /usr/sbin/sendmail -t -i
+    mail.add_x_header = On
+    [SQL]
+    sql.safe_mode = Off
+    [ODBC]
+    odbc.allow_persistent = On
+    odbc.check_persistent = On
+    odbc.max_persistent = -1
+    odbc.max_links = -1
+    odbc.defaultlrl = 4096
+    odbc.defaultbinmode = 1
+    [Interbase]
+    ibase.allow_persistent = 1
+    ibase.max_persistent = -1
+    ibase.max_links = -1
+    ibase.timestampformat = "%Y-%m-%d %H:%M:%S"
+    ibase.dateformat = "%Y-%m-%d"
+    ibase.timeformat = "%H:%M:%S"
+    [MySQLi]
+    mysqli.max_persistent = -1
+    mysqli.allow_persistent = On
+    mysqli.max_links = -1
+    mysqli.cache_size = 2000
+    mysqli.default_port = 3306
+    mysqli.default_socket =
+    mysqli.default_host =
+    mysqli.default_user =
+    mysqli.default_pw =
+    mysqli.reconnect = Off
+    [mysqlnd]
+    mysqlnd.collect_statistics = On
+    mysqlnd.collect_memory_statistics = Off
+    [OCI8]
+    [PostgreSQL]
+    pgsql.allow_persistent = On
+    pgsql.auto_reset_persistent = Off
+    pgsql.max_persistent = -1
+    pgsql.max_links = -1
+    pgsql.ignore_notice = 0
+    pgsql.log_notice = 0
+    [bcmath]
+    bcmath.scale = 0
+    [browscap]
+    [Session]
+    session.save_handler = files
+    session.use_strict_mode = 0
+    session.use_cookies = 1
+    session.use_only_cookies = 1
+    session.name = SESSID
+    session.auto_start = 0
+    session.cookie_lifetime = 0
+    session.cookie_path = /
+    session.cookie_domain =
+    session.cookie_httponly =
+    session.serialize_handler = php
+    session.gc_probability = 1
+    session.gc_divisor = 1000
+    session.gc_maxlifetime = 1440
+    session.referer_check =
+    session.cache_limiter = nocache
+    session.cache_expire = 3600
+    session.use_trans_sid = 0
+    session.hash_function = 0
+    session.hash_bits_per_character = 5
+    url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"
+    [Assertion]
+    zend.assertions = -1
+    [mbstring]
+    [gd]
+    [exif]
+    [Tidy]
+    tidy.clean_output = Off
+    [soap]
+    soap.wsdl_cache_enabled=1
+    soap.wsdl_cache_dir="/tmp"
+    soap.wsdl_cache_ttl=86400
+    soap.wsdl_cache_limit = 5
+    [sysvshm]
+    [ldap]
+    ldap.max_links = -1
+    [mcrypt]
+    [dba]
+    [curl]
+    [openssl]
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: test-honghong
+  name: sample-nginx
+  labels:
+    app: sample-nginx
+spec:
+  storageClassName: "nfs-csi"
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes: ["ReadWriteMany"]
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test-honghong
+  name: sample-nginx
+  labels:
+    app: sample-nginx
+spec:
+  # 타임아웃
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: sample-nginx
+  template:
+    metadata:
+      labels:
+        app: sample-nginx
+    spec:
+      # 여기서는 Always만 가능
+      restartPolicy: Always
+      affinity:
+        nodeAffinity:
+
+          # 우선순위 노드 없으면 아무데나
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - web
+
+          # 일치하는 노드 없으면 안만듬  계속 대기
+          # requiredDuringSchedulingIgnoredDuringExecution:
+          #   nodeSelectorTerms:
+          #   - matchExpressions:
+          #     - key: app
+          #       operator: In
+          #       values:
+          #       - web
+          #   topologyKey: kubernetes.io/hostname
+
+      # schedulerName: default-scheduler
+      # securityContext: {}
+      dnsPolicy: ClusterFirst
+      terminationGracePeriodSeconds: 30
+
+      # https://github.com/kubernetes/git-sync
+      initContainers:
+      - name: git-sync
+        image: registry.k8s.io/git-sync/git-sync:v3.6.8
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: pay-web
+          mountPath: /git
+        env:
+        - name: GIT_SYNC_REPO
+          value: "" ##Private repo-path-you-want-to-clone
+        - name: GIT_SYNC_USERNAME
+          value: ""  ##The username for the repository
+        - name: GIT_SYNC_PASSWORD
+          value: "" ##The Personal Access Token for the repository
+        - name: GIT_SYNC_BRANCH
+          value: "main" ##repo-branch
+        - name: GIT_SYNC_ROOT
+          value: /git
+        - name: GIT_SYNC_DEST
+          value:  "web" ##path-where-you-want-to-clone
+        - name: GIT_SYNC_PERMISSIONS
+          value: "0777"
+        - name: GIT_SYNC_ONE_TIME
+          value: "true"
+        # 서브모듈 무시 "recursive", "shallow", or "off"
+        - name: GIT_SYNC_SUBMODULES
+          value: "off"
+        securityContext:
+          runAsUser: 0
+
+      containers:
+
+      - name: php-fpm
+        image: bitnami/php-fpm:7.4.33
+        imagePullPolicy: IfNotPresent
+        # /opt/bitnami/php/etc
+        volumeMounts:
+        - mountPath: /var/www/html/web/storage
+          name: web-upload
+        - mountPath: /var/www/html/
+          name: pay-web
+        # php.ini php-fpm.conf php-conf.d conf.d
+        - mountPath: /opt/bitnami/php/etc/php-fpm.conf
+          readOnly: true
+          name: php-fpm-conf
+          subPath: php-fpm.conf
+        - mountPath: /opt/bitnami/php/etc/php.ini
+          readOnly: true
+          name: php-ini
+          subPath: php.ini
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: 9000
+          successThreshold: 1
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+        readinessProbe:
+          tcpSocket:
+            port: 9000
+          successThreshold: 1
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+        lifecycle:
+          postStart:
+            exec:
+              # command: ['sh', '-c', 'mkdir -p /var/www/html/web/storage/log && find -type d -exec chmod 755 {} \; && find -type f -exec chmod 644 {} \;']
+              # 나중에 줄이기 ㄱㄱ
+              command:
+              - sh
+              - -c
+              - mkdir -p /var/www/html/web/storage/log && mkdir -p /var/www/html/web/storage/data && mkdir -p /var/www/html/web/storage/upload && mkdir -p /var/www/html/web/storage/image && mkdir -p /var/www/html/web/storage/cache && find -type d -exec chmod 755 {} \; && find -type f -exec chmod 644 {} \; && chown daemon -R /var/www/html/web/storage
+        # resources:
+        #   limits:
+        #     memory: 16Mi
+        #     cpu: 100m
+        #     # ephemeral-storage: "2Gi"
+        #   requests:
+        #     memory: 16Mi
+        #     cpu: 100m
+        #     # ephemeral-storage: "2Gi"
+
+      - name: nginx
+        # image: ubuntu-nginx
+        image: nginx:stable-alpine3.17-slim
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            # httpHeaders:
+            #   - name: myheader
+            #     value: good
+            port: 80
+          successThreshold: 1
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /
+            # httpHeaders:
+            #   - name: myheader
+            #     value: good
+            port: 80
+          successThreshold: 1
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 1
+
+        volumeMounts:
+        - mountPath: /var/www/html/web/storage
+          name: web-upload
+        - mountPath: /var/www/html
+          name: pay-web
+        - mountPath: /etc/nginx/nginx.conf
+          readOnly: true
+          name: nginx-conf
+          subPath: nginx.conf
+        - mountPath: /etc/nginx/conf.d
+          readOnly: true
+          name: nginx-conf-host
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        # resources:
+        #   limits:
+        #     memory: 64Mi
+        #     cpu: 500m
+        #     # ephemeral-storage: "2Gi"
+        #   requests:
+        #     memory: 64Mi
+        #     cpu: 500m
+        #     # ephemeral-storage: "2Gi"
+
+      volumes:
+      # 웹서버 업로드폴더
+      - name: web-upload
+        persistentVolumeClaim:
+          claimName: sample-nginx
+      # git 받아올부분
+      - name: pay-web
+        emptyDir: {}
+      - name: php-fpm-conf
+        configMap:
+          name: sample-php-fpm
+          items:
+          - key: php-fpm.conf
+            path: php-fpm.conf
+      - name: php-ini
+        configMap:
+          name: sample-php-fpm
+          items:
+          - key: php.ini
+            path: php.ini
+      - name: nginx-conf
+        configMap:
+          name: sample-nginx
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+      - name: nginx-conf-host
+        configMap:
+          name: sample-nginx
+          items:
+          - key: server.conf
+            path: server.conf
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-nginx
+  namespace: test-honghong
+  labels:
+    app: sample-nginx
+spec:
+  # 아이피 범위 10.96.0.0/12 라고 에러뜸
+  # clusterIP: 10.96.0.2
+  type: NodePort
+  # type: ClusterIP
+  ports:
+  - port: 80
+    # 안찍으면 랜덤
+    nodePort: 30000
+    targetPort: 80
+    protocol: TCP
+    name: http
+  # - port: 443
+  #   protocol: TCP
+  #   name: https
+  selector:
+    app: sample-nginx
+---
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sample-nginx
+  namespace: test-honghong
+  labels:
+    app: sample-nginx
+spec:
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - resource:
+      name: cpu 
+      target:
+        averageUtilization: 80
+        type: Utilization
+    type: Resource
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sample-nginx
