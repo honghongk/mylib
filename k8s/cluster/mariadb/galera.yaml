@@ -30,6 +30,17 @@ data:
     user = mysql
     bind-address = 0.0.0.0
 
+    # 외부 잠금 비활성화
+    skip-external-locking
+    # 호스트 이름 캐싱 비활성화
+    #skip-host-cache
+    # 락걸린 부분 스킵
+    #skip-locking
+    # 접속시 ip로 호스트 이름 찾기 스킵
+    skip-name-resolve
+    # 클라이언트의 캐릭셋 무시, 윈도우같은 경우 euckr 로 접속할 수도 있다고
+    skip-character-set-client-handshake
+
     character-set-client-handshake = FALSE
     character-set-server           = utf8mb4
     collation-server               = utf8mb4_unicode_ci
