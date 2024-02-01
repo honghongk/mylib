@@ -1,0 +1,25 @@
+/* 뱃지 - 보라색 */
+.badge-cross{
+    border: 1px #ddff;
+    border-radius: 1em;
+    padding: 0.5em;
+    background-color: #ddff;
+    color: purple;
+}
+
+/* 데코 */
+.badge-cross:before, .badge-cross:after{
+    /* 필수 */
+    content: "+";
+    position: absolute;
+    /* 색상 */
+    color: blueviolet;
+}
+.badge-cross:before{
+    /* 왼쪽 위에 놓기 */
+    transform: translate(-1em, -1em);
+}
+.badge-cross:after{
+    /* 오른쪽 아래 놓기 */
+    transform: translate(0.45em, 1em);
+}
