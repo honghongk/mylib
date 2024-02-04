@@ -15,8 +15,6 @@ function_exists()
 ###################
 # cpu 수 반환
 # https://zetawiki.com/wiki/%EB%A6%AC%EB%88%85%EC%8A%A4_CPU_%EA%B0%9C%EC%88%98_%ED%99%95%EC%9D%B8
-# count_cpu()
-#   - echo: 숫자
 ###################
 count_cpu()
 {
@@ -35,6 +33,7 @@ count_cpu()
 ###################
 load_average()
 {
+    # 
     cat /proc/loadavg
 }
 
